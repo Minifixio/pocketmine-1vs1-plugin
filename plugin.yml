@@ -1,9 +1,5 @@
-name: StatsPVP
-main: Minifixio\statspvp\StatsPVP
+name: 1vs1
+main: Minifixio\onevsone\OneVsOne
 version: 0.0.1
 api: [1.0.0, 1.1.0]
-description: Stats pour PVP
-permissions:
-    statspvp.stats:
-        default: op
-        description: Affiche les statistiques du joueur
+description: 1vs1 Plugin pour PvP
