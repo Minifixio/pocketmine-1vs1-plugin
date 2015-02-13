@@ -3,6 +3,9 @@
 namespace Minifixio\onevsone\model;
 
 use pocketmine\Player;
+use pocketmine\Server;
+use pocketmine\level\Level;
+use pocketmine\level\Position;
 
 class Arena{
 
@@ -18,19 +21,33 @@ class Arena{
 	
 	public $posZ = -1;
 	
+	/** @var Level */
 	public $level = NULL;
-	
 	
 	//Durée du round en seconde (= 3min )
 	const ROUND_DURATION = 180;
 	
 	//Variable permettant d'arreter le timer du round
-	private $taskHendler;
-	
+	private $taskHandler;
+
+	/**
+	 * Build a new Arena
+	 * @param int $posX
+	 * @param int $posY
+	 * @param int $posZ
+	 * @param string $level MCPE level for this arena 
+	 */
+	public function __construct($posX, $posY, $posZ, Level $level){
+		$this->posX = $posX;
+		$this->posY = $posY;
+		$this->posZ = $posZ;
+		$this->active = FALSE;
+		$this->level = $level;
+	}
 	
 	/** 
 	 * Demarre un match.
-	 * @param array $players
+	 * @param Player[] $players
 	 */
 	public function startRound(array $players){
 		$this->$players = $players;
@@ -47,6 +64,7 @@ class Arena{
 			$this->giveKit($player);
 		
 		}
+		
 		//Fixe l'heure de debut
 		$this->$startTime = new Date();
 		$this->$active = TRUE;
@@ -54,7 +72,7 @@ class Arena{
 		//Lance la tache de cloture du round
 		$task = new RoundCheckTask();
 		$task->arena = $this;
-		$taskHendler = Server::getInstance()->getScheduler()->scheduleDelayedTask($task, self::ROUND_DURATION);
+		$this->taskHandler = Server::getInstance()->getScheduler()->scheduleDelayedTask($task, self::ROUND_DURATION);
 		
 	}
 	
@@ -78,6 +96,10 @@ class Arena{
 		
    }
    
+   /**
+    * When a player was killed
+    * @param Player $loser
+    */
    public function onPlayerDeath(Player $loser){
    	
 		//Finit le duel et teleporte le gagnant au spawn	
@@ -96,33 +118,35 @@ class Arena{
    		//On lui ajoute des points et des coins
    		//TODO:Lui donner des points de victoires
    }
-   
+
+   /**
+    * Reset the Arena to current state
+    */
    private function reset(){
-   	
    		//Rend une arene active apres un combat
    		$this->$active = FALSE;
    		$this->$players = array();
    		$this->$startTime = NULL;
-   		Server::getInstance()->getScheduler()->cancelTask($taskHendler)->taskId();
-   		
-   		
-   	
-   	
+   		Server::getInstance()->getScheduler()->cancelTask($this->taskHandler)->taskId();
    }
+   
+   /**
+    * When a player quit the game
+    * @param Player $loser
+    */
    public function onPlayerQuit(Player $loser){
-   	
    		//Finit le duel quand un joueur quitte
    		//Tout est fait par la fonction onPlayerDeath ( voir plus haut )
    		$this->onPlayerDeath();
    }
    
+   /**
+    * When maximum round time is reached
+    */
    public function onRoundEnd(){
-   	
    		foreach ($players as $player){
    			$player->teleport($player->getSpawn());
-   			
    			$player->sendMessage("VoltCraftPvP >> Le temps de jeu à été dépassé, le duel a été arrete.");
-   	
    		}
 	 }
 }
