@@ -2,10 +2,15 @@
 
 namespace Minifixio\onevsone\model;
 
+use Minifixio\onevsone\OneVsOne;
+use Minifixio\onevsone\utils\PluginUtils;
+
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\level\Position;
 use pocketmine\item\Item;
+
+use \DateTime;
 
 class Arena{
 
@@ -19,7 +24,7 @@ class Arena{
 	public $position;
 	
 	//Durée du round en seconde (= 3min )
-	const ROUND_DURATION = 180;
+	const ROUND_DURATION = 30;
 	
 	//Variable permettant d'arreter le timer du round
 	private $taskHandler;
@@ -54,13 +59,16 @@ class Arena{
 		}
 		
 		//Fixe l'heure de debut
-		$this->$startTime = new DateTime('now');
-		$this->$active = TRUE;
+		$this->startTime = new DateTime('now');
+		$this->active = TRUE;
+		
+		PluginUtils::sendMessageWithSpaces($player1, "Vous commencez un duel contre : " . $player2->getName() . " !", 5);
+		PluginUtils::sendMessageWithSpaces($player2, "Vous commencez un duel contre : " . $player1->getName() . " !", 5);
 		
 		//Lance la tache de cloture du round
-		$task = new RoundCheckTask();
+		$task = new RoundCheckTask(OneVsOne::getInstance());
 		$task->arena = $this;
-		$this->taskHandler = Server::getInstance()->getScheduler()->scheduleDelayedTask($task, self::ROUND_DURATION);
+		$this->taskHandler = Server::getInstance()->getScheduler()->scheduleDelayedTask($task, self::ROUND_DURATION * 20);
 		
 	}
 	
@@ -69,10 +77,6 @@ class Arena{
 		$player->getInventory()->clearAll();
 		
 		//Donne une epee , armure et nourriture
-		$player->getInventory()->addItem(Item::get(302, 0, 1));
-		$player->getInventory()->addItem(Item::get(303, 0, 1));
-		$player->getInventory()->addItem(Item::get(304, 0, 1));
-		$player->getInventory()->addItem(Item::get(305, 0, 1));
 		$player->getInventory()->addItem(Item::get(267, 0, 1));
 		$player->getInventory()->addItem(Item::get(297, 0, 5));
 		
@@ -81,9 +85,11 @@ class Arena{
 		$player->getInventory()->setChestplate(Item::get(303, 0, 1));
 		$player->getInventory()->setLeggings(Item::get(304, 0, 1));
 		$player->getInventory()->setBoots(Item::get(305, 0, 1));
+		$player->getInventory()->sendArmorContents($player);
 		
-		$player->sendMessage("[1vs1] Que le duel commence !");
-		
+		//On lui redonne toute sa vie
+		$player->setHealth(20);
+
    }
    
    /**
@@ -97,7 +103,7 @@ class Arena{
    			$winner = $this->players[1];
    		}
    		else{
-   			$winner = $this->Player[0];
+   			$winner = $this->players[0];
    		}
    		//On teleporte le gagnant au spawn
    		$winner->teleport($winner->getSpawn());
@@ -119,10 +125,10 @@ class Arena{
     */
    private function reset(){
    		//Rend une arene active apres un combat
-   		$this->$active = FALSE;
-   		$this->$players = array();
-   		$this->$startTime = NULL;
-   		Server::getInstance()->getScheduler()->cancelTask($this->taskHandler)->taskId();
+   		$this->active = FALSE;
+   		$this->players = array();
+   		$this->startTime = NULL;
+   		Server::getInstance()->getScheduler()->cancelTask($this->taskHandler->getTaskId());
    }
    
    /**
@@ -139,7 +145,7 @@ class Arena{
     * When maximum round time is reached
     */
    public function onRoundEnd(){
-   		foreach ($players as $player){
+   		foreach ($this->players as $player){
    			$player->teleport($player->getSpawn());
    			$player->sendMessage(" ");
    			$player->sendMessage("++++++++=++++++++");
@@ -147,6 +153,10 @@ class Arena{
    			$player->sendMessage("++++++++=++++++++");
    			$player->sendMessage(" ");
    		}
+	 }
+	 
+	 public function isPlayerInArena(Player $player){
+	 	return in_array($player, $this->players);
 	 }
 }
 

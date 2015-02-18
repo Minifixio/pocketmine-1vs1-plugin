@@ -36,7 +36,9 @@ class ArenaManager{
 		
 		// Check that player is not already in the queue
 		if(in_array($newPlayer, $this->queue)){
+			$newPlayer->sendMessage(" ");
 			$newPlayer->sendMessage("[1vs1] Vous etes deja dans la file d'attente.");
+			$newPlayer->sendMessage(" ");
 			return;
 		}
 		
@@ -46,6 +48,9 @@ class ArenaManager{
 		
 		// display some stats
 		PluginUtils::logOnConsole("There is actually " . count($this->queue) . " players in the queue");
+		$newPlayer->sendMessage("[1vs1] Vous avez rejoins la file d'attente.");
+		$newPlayer->sendMessage(" ");
+		$newPlayer->sendMessage("[1vs1] Il y a " . count($this->queue) . " joueurs en attente.");
 		
 		$this->launchNewRounds();
 	}
@@ -76,6 +81,20 @@ class ArenaManager{
 		array_push($roundPlayers, array_shift($this->queue), array_shift($this->queue));
 		PluginUtils::logOnConsole("" . implode($roundPlayers));
 		$arena->startRound($roundPlayers);
+	}
+	
+	/**
+	 * Gat current arena for player
+	 * @param Player $player
+	 * @return Arena or NULL
+	 */
+	public function getPlayerArena(Player $player){
+		foreach ($this->arenas as $arena) {
+			if($arena->isPlayerInArena($player)){
+				return $arena;
+			}
+		}	
+		return NULL;	
 	}
 }
 

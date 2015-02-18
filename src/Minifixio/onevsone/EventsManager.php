@@ -20,13 +20,21 @@ class EventsManager implements Listener{
 	private $arenaManager;
 	
 	public function __construct(ArenaManager $arenaManager){
-		$this->arenaMager = $arenaManager;
+		$this->arenaManager = $arenaManager;
 	}
 	
 	public function onPlayerJoin(PlayerJoinEvent $event){
 		PluginUtils::logOnConsole("a new player as join");
 	}	
-
+	
+	public function onPlayerDeath(PlayerDeathEvent $event){
+		$deadPlayer = $event->getEntity();
+		$arena = $this->arenaManager->getPlayerArena($deadPlayer);
+		if($arena != NULL){
+			$arena->onPlayerDeath($deadPlayer);
+		}
+		
+	}
 }
 
 

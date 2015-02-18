@@ -11,6 +11,9 @@ use Minifixio\onevsone\command\JoinCommand;
 
 class OneVsOne extends PluginBase{
 	
+	/** @var OneVsOne */
+	private static $instance;
+	
 	/** @var ArenaManager */
 	private $arenaManager;
 	
@@ -33,6 +36,12 @@ class OneVsOne extends PluginBase{
     	// Register commands
     	$command = new JoinCommand($this, $this->arenaManager);
     	$this->getServer()->getCommandMap()->register("joinpvp", $command);
+    	
+    	self::$instance = $this;
+    }
+    
+    public static function getInstance(){
+    	return self::$instance;
     }
     
     public function onDisable() {
