@@ -24,8 +24,9 @@ class ArenaManager{
 	 */
 	public function init(){
 		PluginUtils::logOnConsole("Init ArenaManager");
-		$firstArena = new Arena(0,0,0,Server::getInstance()->getDefaultLevel());
-		$arenas[0] = $firstArena;
+		$spawnPosition = Server::getInstance()->getDefaultLevel()->getSpawnLocation();
+		$firstArena = new Arena($spawnPosition);
+		array_push($this->arenas,$firstArena);
 	}
 	
 	/**
@@ -34,7 +35,10 @@ class ArenaManager{
 	public function addNewPlayerToQueue(Player $newPlayer){
 		
 		// Check that player is not already in the queue
-		// TODO : for Minifixio :)
+		if(in_array($newPlayer, $this->queue)){
+			$newPlayer->sendMessage("[1vs1] Vous etes deja dans la file d'attente.");
+			return;
+		}
 		
 		// add player to queue
 		PluginUtils::logOnConsole("Adding " . $newPlayer->getName() . " to queue");
@@ -52,14 +56,26 @@ class ArenaManager{
 	private function launchNewRounds(){
 		
 		// Check that there is at least 2 players in the queue
-		// TODO : for Minifixio :)
+		if(count($this->queue) < 2){
+			PluginUtils::logOnConsole("There is not enought players in the queue.");
+			return;
+		}
 		
 		// Check if there is any arena free (not active)
-		// TODO : for Minifixio :)		
+		$arena = $this->arenas[0];
+		while ($arena !== FALSE && $arena->active) {
+			$arena = next($this->arenas);
+		}
+		if($arena == FALSE){
+			PluginUtils::logOnConsole("There are no free arenas." );
+			return;
+		}
 		
 		// Send the players into the arena (and remove them from queues)
-		// TODO : for Minifixio :)		
-		
+		$roundPlayers = array();
+		array_push($roundPlayers, array_shift($this->queue), array_shift($this->queue));
+		PluginUtils::logOnConsole("" . implode($roundPlayers));
+		$arena->startRound($roundPlayers);
 	}
 }
 

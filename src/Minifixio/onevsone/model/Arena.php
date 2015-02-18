@@ -4,8 +4,8 @@ namespace Minifixio\onevsone\model;
 
 use pocketmine\Player;
 use pocketmine\Server;
-use pocketmine\level\Level;
 use pocketmine\level\Position;
+use pocketmine\item\Item;
 
 class Arena{
 
@@ -14,15 +14,9 @@ class Arena{
 	public $startTime;
 	
 	public $players = array();
-	
-	public $posX = -1;
-	
-	public $posY = -1;
-	
-	public $posZ = -1;
-	
-	/** @var Level */
-	public $level = NULL;
+
+	/** var Position */
+	public $position;
 	
 	//Durée du round en seconde (= 3min )
 	const ROUND_DURATION = 180;
@@ -32,17 +26,11 @@ class Arena{
 
 	/**
 	 * Build a new Arena
-	 * @param int $posX
-	 * @param int $posY
-	 * @param int $posZ
-	 * @param string $level MCPE level for this arena 
+	 * @param Position position Base position of the Arena
 	 */
-	public function __construct($posX, $posY, $posZ, Level $level){
-		$this->posX = $posX;
-		$this->posY = $posY;
-		$this->posZ = $posZ;
+	public function __construct($position){
+		$this->position = $position;
 		$this->active = FALSE;
-		$this->level = $level;
 	}
 	
 	/** 
@@ -50,23 +38,23 @@ class Arena{
 	 * @param Player[] $players
 	 */
 	public function startRound(array $players){
-		$this->$players = $players;
+		$this->players = $players;
 		$player1 = $players[0];
-		$plyer2 = $players[1];
+		$player2 = $players[1];
+		
 		//Teleport le premier joueur
-		$player1->teleport(new Position($this->$posX, $this->$posY, $this->$posZ, $this->level));
+		$player1->teleport($this->position);
 		
 		//Teleport le deuxieme joueur
-		$player2->teleport(new Position($pos->x + 0.5, $pos->y + 1, $pos->z + 0.5, $this->level));
+		$player2->teleport($this->position);
 		
 		//Donne kit
 		foreach ($players as $player){
 			$this->giveKit($player);
-		
 		}
 		
 		//Fixe l'heure de debut
-		$this->$startTime = new Date();
+		$this->$startTime = new DateTime('now');
 		$this->$active = TRUE;
 		
 		//Lance la tache de cloture du round
@@ -78,7 +66,7 @@ class Arena{
 	
 	private function giveKit(Player $player){
 		//Vide l'inventaire
-		$player->getInventory->clearAll();
+		$player->getInventory()->clearAll();
 		
 		//Donne une epee , armure et nourriture
 		$player->getInventory()->addItem(Item::get(302, 0, 1));
@@ -90,9 +78,9 @@ class Arena{
 		
 		//Met l'armure sur lui
 		$player->getInventory()->setHelmet(Item::get(302, 0, 1));
-		$player->getInventory()->setBoots(Item::get(303, 0, 1));
-		$player->getInventory()->setLeggins(Item::get(304, 0, 1));
-		$player->getInventory()->setChesplate(Item::get(305, 0, 1));
+		$player->getInventory()->setChestplate(Item::get(303, 0, 1));
+		$player->getInventory()->setLeggings(Item::get(304, 0, 1));
+		$player->getInventory()->setBoots(Item::get(305, 0, 1));
 		
 		$player->sendMessage("[1vs1] Que le duel commence !");
 		
@@ -153,15 +141,11 @@ class Arena{
    public function onRoundEnd(){
    		foreach ($players as $player){
    			$player->teleport($player->getSpawn());
-<<<<<<< HEAD
    			$player->sendMessage(" ");
    			$player->sendMessage("++++++++=++++++++");
    			$player->sendMessage("Temps de jeu dépassé. Duel arreté, pas de vainqueur !");
    			$player->sendMessage("++++++++=++++++++");
    			$player->sendMessage(" ");
-=======
-   			$player->sendMessage("VoltCraftPvP >> Le temps de jeu à été dépassé, le duel a été arrete.");
->>>>>>> branch 'master' of https://Minifixio@bitbucket.org/Minifixio/mcpe_1vs1_plugin.git
    		}
 	 }
 }
