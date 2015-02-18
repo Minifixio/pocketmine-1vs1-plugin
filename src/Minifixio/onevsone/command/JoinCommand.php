@@ -1,6 +1,6 @@
 <?php
 
-namespace Minifixio\statspvp;
+namespace Minifixio\onevsone\command;
 
 use pocketmine\command\Command;
 use pocketmine\command\PluginIdentifiableCommand;
@@ -9,17 +9,23 @@ use pocketmine\level\Level;
 use pocketmine\Player;
 use pocketmine\Server;
 
-class StatsCommand extends Command implements PluginIdentifiableCommand{
+use Minifixio\onevsone\OneVsOne;
+use Minifixio\onevsone\ArenaManager;
+
+class JoinCommand extends Command implements PluginIdentifiableCommand{
 
 	private $plugin;
-	private $commandName = "stats";
+	private $arenaManager;
+	private $commandName = "joinpvp";
 	private $command;
 
-	public function __construct(StatsPVP $plugin){
-		parent::__construct($this->commandName, "Affiche les statistisques PVP");
+	public function __construct(OneVsOne $plugin, ArenaManager $arenaManager){
+		parent::__construct($this->commandName, "Rejoins une arene PVP");
 		$this->setUsage("/$this->commandName");
-		$this->plugin = $plugin;
 		$this->command = $this->commandName;
+		
+		$this->plugin = $plugin;
+		$this->arenaManager = $arenaManager;
 	}
 
 	public function getPlugin(){
@@ -36,12 +42,8 @@ class StatsCommand extends Command implements PluginIdentifiableCommand{
 			return true;
 		}
 		
-		$stats = $this->plugin->getStats($sender->getName());
-		$sender->sendMessage("====== Vos stats =====");
-		$sender->sendMessage("- Kills : " . $stats["nbKill"] );
-		$sender->sendMessage("- Morts : " . $stats["nbDeath"] );
-		$sender->sendMessage("- Coins : " . $stats["nbCoin"] );
-		$sender->sendMessage("=====================");
+		$this->arenaManager->addNewPlayerToQueue($sender);
+		
 		return true;
 	}
 }

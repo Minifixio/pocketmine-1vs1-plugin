@@ -3,29 +3,39 @@
 namespace Minifixio\onevsone;
 
 use pocketmine\plugin\PluginBase;
-use pocketmine\event\Listener;
-use pocketmine\command\CommandSender;
-use pocketmine\command\Command;
-use pocketmine\Player;
-use pocketmine\event\entity\EntityDeathEvent;
-use pocketmine\event\player\PlayerDeathEvent;
-use pocketmine\event\entity\EntityDamageByEntityEvent;
-        
-use pocketmine\event\player\PlayerJoinEvent;
 
-class OneVsOne extends PluginBase  implements Listener{
+use Minifixio\onevsone\ArenaManager;
+use Minifixio\onevsone\EventsManager;
+use Minifixio\onevsone\utils\PluginUtils;
+use Minifixio\onevsone\command\JoinCommand;
+
+class OneVsOne extends PluginBase{
 	
+	/** @var ArenaManager */
+	private $arenaManager;
+	
+	/**
+	* Plugin is enabled by PocketMine server
+	*/
     public function onEnable(){
-    	$this->getServer()->getPluginManager()->registerEvents($this, $this);
+    	
+    	PluginUtils::logOnConsole("Init OneVsOne plugin");
+    	
+    	$this->arenaManager = new ArenaManager();
+    	$this->arenaManager->init();
+    	
+    	// Register events
+    	$this->getServer()->getPluginManager()->registerEvents(
+    			new EventsManager($this->arenaManager), 
+    			$this
+    		);
+    	
+    	// Register commands
+    	$command = new JoinCommand($this, $this->arenaManager);
+    	$this->getServer()->getCommandMap()->register("joinpvp", $command);
     }
     
     public function onDisable() {
  
     }
-
-    private function logOnConsole($message){
-    	$this->getServer()->broadcastMessage($message);
-    	
-    }
-
 }

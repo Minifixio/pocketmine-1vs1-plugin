@@ -153,11 +153,15 @@ class Arena{
    public function onRoundEnd(){
    		foreach ($players as $player){
    			$player->teleport($player->getSpawn());
+<<<<<<< HEAD
    			$player->sendMessage(" ");
    			$player->sendMessage("++++++++=++++++++");
    			$player->sendMessage("Temps de jeu dépassé. Duel arreté, pas de vainqueur !");
    			$player->sendMessage("++++++++=++++++++");
    			$player->sendMessage(" ");
+=======
+   			$player->sendMessage("VoltCraftPvP >> Le temps de jeu à été dépassé, le duel a été arrete.");
+>>>>>>> branch 'master' of https://Minifixio@bitbucket.org/Minifixio/mcpe_1vs1_plugin.git
    		}
 	 }
 }
