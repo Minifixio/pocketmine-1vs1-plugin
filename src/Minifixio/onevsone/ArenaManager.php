@@ -7,6 +7,9 @@ use Minifixio\onevsone\utils\PluginUtils;
 
 use pocketmine\Server;
 use pocketmine\Player;
+use pocketmine\level\Location;
+use pocketmine\level\Position;
+use pocketmine\utils\Config;
 
 /**
  * Manages PVP arenas
@@ -19,15 +22,35 @@ class ArenaManager{
 	/** @var Player[] **/
 	private $queue = array();	
 	
+	/** @var Config */
+	private $config;
+	
 	/**
 	 * Init the arenas
 	 */
-	public function init(){
+	public function init($arenaPositions, $config){
 		PluginUtils::logOnConsole("Init ArenaManager");
-		$spawnPosition = Server::getInstance()->getDefaultLevel()->getSpawnLocation();
-		$firstArena = new Arena($spawnPosition);
-		array_push($this->arenas,$firstArena);
+		$this->parsePositions($arenaPositions);
+		$this->config = $config;
 	}
+	
+	/**
+	 * Create arenas
+	 */
+	public function parsePositions(array $arenaPositions) {
+		foreach ($arenaPositions as $n => $arenaPosition) {
+			Server::getInstance()->loadLevel($arenaPosition[3]);
+			if(($level = Server::getInstance()->getLevelByName($arenaPosition[3])) === null){
+				Server::getInstance()->getLogger()->error($arenaPosition[3] . " is not loaded. Arena " . $n . " is disabled.");
+			}
+			else{
+				$newArenaPosition = new Position($arenaPosition[0], $arenaPosition[1], $arenaPosition[2], $level);
+				$newArena = new Arena($newArenaPosition);
+				array_push($this->arenas, $newArena);
+				Server::getInstance()->getLogger()->debug("Arena " . $n . " loaded at position " . $newArenaPosition->__toString());
+			}
+		}
+	}	
 	
 	/**
 	 * Add player into the queue
@@ -49,8 +72,8 @@ class ArenaManager{
 		// display some stats
 		PluginUtils::logOnConsole("There is actually " . count($this->queue) . " players in the queue");
 		$newPlayer->sendMessage("[1vs1] Vous avez rejoins la file d'attente.");
-		$newPlayer->sendMessage(" ");
 		$newPlayer->sendMessage("[1vs1] Il y a " . count($this->queue) . " joueurs en attente.");
+		$newPlayer->sendMessage("[1vs1] Il faut minimum 2 joueurs pour commencer un duel.");
 		
 		$this->launchNewRounds();
 	}
@@ -84,7 +107,7 @@ class ArenaManager{
 	}
 	
 	/**
-	 * Gat current arena for player
+	 * Get current arena for player
 	 * @param Player $player
 	 * @return Arena or NULL
 	 */
@@ -95,6 +118,26 @@ class ArenaManager{
 			}
 		}	
 		return NULL;	
+	}
+	
+	/**
+	 * Reference a new arena at this location
+	 * @param Location $location for the new Arena
+	 */
+	public function referenceNewArena(Location $location){
+		// Create a new arena
+		$newArena = new Arena($location);	
+		
+		// Add it to the array
+		array_push($this->arenas,$newArena);
+		
+		// Save it to config
+		$this->config->set(count($this->arenas), [$newArena->position->getX(), $newArena->position->getY(), $newArena->position->getZ(), $newArena->position->getLevel()->getName()]);
+		$this->config->save();		
+	}
+	
+	public function getNumberOfArenas(){
+		return count($this->arenas);
 	}
 }
 

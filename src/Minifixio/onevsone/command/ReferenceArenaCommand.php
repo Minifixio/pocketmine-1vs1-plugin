@@ -5,29 +5,30 @@ namespace Minifixio\onevsone\command;
 use pocketmine\command\Command;
 use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\command\CommandSender;
-use pocketmine\level\Level;
+use pocketmine\level\Location;
 use pocketmine\Player;
 use pocketmine\Server;
 
 use Minifixio\onevsone\OneVsOne;
 use Minifixio\onevsone\ArenaManager;
 
-class JoinCommand extends Command implements PluginIdentifiableCommand{
+/**
+ * Command to reference a new Arena in the pool 
+ * @author Minifixio
+ */
+class ReferenceArenaCommand extends Command {
 
 	private $plugin;
 	private $arenaManager;
-	public $commandName = "match";
+	public $commandName = "refarena";
 
 	public function __construct(OneVsOne $plugin, ArenaManager $arenaManager){
-		parent::__construct($this->commandName, "Rejoins la file d'attente 1vs1.");
+		parent::__construct($this->commandName, "Reference a new arena");
 		$this->setUsage("/$this->commandName");
+		$this->command = $this->commandName;
 		
 		$this->plugin = $plugin;
 		$this->arenaManager = $arenaManager;
-	}
-
-	public function getPlugin(){
-		return $this->plugin;
 	}
 
 	public function execute(CommandSender $sender, $label, array $params){
@@ -40,7 +41,14 @@ class JoinCommand extends Command implements PluginIdentifiableCommand{
 			return true;
 		}
 		
-		$this->arenaManager->addNewPlayerToQueue($sender);
+		// Get current op location
+		$playerLocation = $sender->getLocation();
+		
+		// Add the arena
+		$this->arenaManager->referenceNewArena($playerLocation);
+		
+		// Notify the op
+		$sender->sendMessage("The new arena has been created. There is now " . $this->arenaManager->getNumberOfArenas() ." arenas.");
 		
 		return true;
 	}

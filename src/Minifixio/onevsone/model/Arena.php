@@ -20,11 +20,14 @@ class Arena{
 	
 	public $players = array();
 
-	/** var Position */
+	/** @var Position */
 	public $position;
 	
 	//Durée du round en seconde (= 3min )
 	const ROUND_DURATION = 30;
+	
+	const PLAYER_1_OFFSET_X = 6;
+	const PLAYER_2_OFFSET_X = -5;
 	
 	//Variable permettant d'arreter le timer du round
 	private $taskHandler;
@@ -47,11 +50,19 @@ class Arena{
 		$player1 = $players[0];
 		$player2 = $players[1];
 		
+		$pos_player1 = Position::fromObject($this->position, $this->position->getLevel());
+		$pos_player1->x += self::PLAYER_1_OFFSET_X;
+		
+		$pos_player2 = Position::fromObject($this->position, $this->position->getLevel());
+		$pos_player2->x += self::PLAYER_2_OFFSET_X;
+		$player1->sendMessage(" Ta position " . $pos_player1->__toString());
+		$player2->sendMessage(" Ta position " . $pos_player2->__toString());
+		
 		//Teleport le premier joueur
-		$player1->teleport($this->position);
+		$player1->teleport($pos_player1, 90, 0);
 		
 		//Teleport le deuxieme joueur
-		$player2->teleport($this->position);
+		$player2->teleport($pos_player2, -90, 0);
 		
 		//Donne kit
 		foreach ($players as $player){
@@ -62,8 +73,23 @@ class Arena{
 		$this->startTime = new DateTime('now');
 		$this->active = TRUE;
 		
-		PluginUtils::sendMessageWithSpaces($player1, "Vous commencez un duel contre : " . $player2->getName() . " !", 5);
-		PluginUtils::sendMessageWithSpaces($player2, "Vous commencez un duel contre : " . $player1->getName() . " !", 5);
+		$player1->sendMessage(" ");
+		$player1->sendMessage("++++++++=++++++++");
+		$player1->sendMessage(">> Vous commencez un duel contre : " . $player2->getName() . " !");
+		$player1->sendMessage(">> Vous avez 3 min !");
+		$player1->sendMessage(">> Bonne chance !");
+		$player1->sendMessage("++++++++=++++++++");
+		$player1->sendMessage(" ");
+		
+		$player2->sendMessage(" ");
+		$player2->sendMessage("++++++++=++++++++");
+		$player2->sendMessage(">> Vous commencez un duel contre : " . $player1->getName() . " !");
+		$player2->sendMessage(">> Vous avez 3 min !");
+		$player2->sendMessage(">> Bonne chance !");
+		$player2->sendMessage("++++++++=++++++++");
+		$player2->sendMessage(" ");
+		
+		
 		
 		//Lance la tache de cloture du round
 		$task = new RoundCheckTask(OneVsOne::getInstance());
@@ -111,9 +137,20 @@ class Arena{
    		//On reset l'arene
    		$this->reset();
    		
+   		$loser->sendMessage("++++++++=++++++++");
+   		$loser->sendMessage(">> Vous avez perdu le duel contre" . $winner->getName() . " !");
+   		$loser->sendMessage(">> Retentez votre chance la prochaine fois !");
+   		$loser->sendMessage("++++++++=++++++++");
+   		 
+   		
    		$winner->sendMessage("++++++++=++++++++");
-   		$winner->sendMessage("Vous avez gangné le duel !");
+   		$winner->sendMessage(">> Vous avez gangné le duel contre : " . $loser->getName() . " !");
+   		$winner->sendMessage(">> Vous avez gagné avec " . $winner->getHealth() . " de vie !");
+   		$winner->sendMessage("+1 coins");
+   		$winner->sendMessage("+1 kill");
    		$winner->sendMessage("++++++++=++++++++");
+   		
+   		Server::getInstance()->broadcastMessage("-> " . $winner->getName() . " a gagné un duel contre " . $loser->getName() . " !");
    		
    		
    		//On lui ajoute des points et des coins
@@ -149,7 +186,8 @@ class Arena{
    			$player->teleport($player->getSpawn());
    			$player->sendMessage(" ");
    			$player->sendMessage("++++++++=++++++++");
-   			$player->sendMessage("Temps de jeu dépassé. Duel arreté, pas de vainqueur !");
+   			$player->sendMessage(">> Temps de jeu dépassé. Duel arreté, pas de vainqueur !");
+   			$player->sendMessage(">> Soyez plus rapide la prochaine fois.");       
    			$player->sendMessage("++++++++=++++++++");
    			$player->sendMessage(" ");
    		}
