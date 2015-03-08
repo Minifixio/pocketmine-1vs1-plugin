@@ -55,8 +55,6 @@ class Arena{
 		
 		$pos_player2 = Position::fromObject($this->position, $this->position->getLevel());
 		$pos_player2->x += self::PLAYER_2_OFFSET_X;
-		$player1->sendMessage(" Ta position " . $pos_player1->__toString());
-		$player2->sendMessage(" Ta position " . $pos_player2->__toString());
 		
 		//Teleport le premier joueur
 		$player1->teleport($pos_player1, 90, 0);
@@ -130,12 +128,7 @@ class Arena{
    		}
    		else{
    			$winner = $this->players[0];
-   		}
-   		//On teleporte le gagnant au spawn
-   		$winner->teleport($winner->getSpawn());
-   		
-   		//On reset l'arene
-   		$this->reset();
+   		}  		
    		
    		$loser->sendMessage("++++++++=++++++++");
    		$loser->sendMessage(">> Vous avez perdu le duel contre" . $winner->getName() . " !");
@@ -149,12 +142,21 @@ class Arena{
    		$winner->sendMessage("+1 coins");
    		$winner->sendMessage("+1 kill");
    		$winner->sendMessage("++++++++=++++++++");
+
+   		//On teleporte le gagnant au spawn
+   		$winner->teleport($winner->getSpawn());
+
+   		//On lui redonne toute sa vie
+   		$winner->setHealth(20);
    		
    		Server::getInstance()->broadcastMessage("-> " . $winner->getName() . " a gagné un duel contre " . $loser->getName() . " !");
    		
    		
    		//On lui ajoute des points et des coins
    		//TODO:Lui donner des points de victoires
+
+   		//On reset l'arene
+   		$this->reset();
    }
 
    /**
@@ -163,6 +165,13 @@ class Arena{
    private function reset(){
    		//Rend une arene active apres un combat
    		$this->active = FALSE;
+   		foreach ($this->players as $player){
+   			$player->getInventory()->clearAll();
+   			$player->getInventory()->setItemInHand(new Item(Item::AIR,0,0));
+   			$player->getInventory()->sendArmorContents($player);
+   			$player->getInventory()->sendContents($player);
+   			$player->getInventory()->sendHeldItem($player);
+   		}
    		$this->players = array();
    		$this->startTime = NULL;
    		Server::getInstance()->getScheduler()->cancelTask($this->taskHandler->getTaskId());
@@ -191,6 +200,9 @@ class Arena{
    			$player->sendMessage("++++++++=++++++++");
    			$player->sendMessage(" ");
    		}
+   		
+   		//On reset l'arene
+   		$this->reset();   		
 	 }
 	 
 	 public function isPlayerInArena(Player $player){

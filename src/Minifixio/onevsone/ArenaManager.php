@@ -65,6 +65,15 @@ class ArenaManager{
 			return;
 		}
 		
+		// Check that player is not currently in an arena
+		$currentArena = $this->getPlayerArena($newPlayer);
+		if($currentArena != null){
+			$newPlayer->sendMessage(" ");
+			$newPlayer->sendMessage("[1vs1] Vous etes deja dans une arene");
+			$newPlayer->sendMessage(" ");				
+			return;
+		}
+		
 		// add player to queue
 		PluginUtils::logOnConsole("Adding " . $newPlayer->getName() . " to queue");
 		array_push($this->queue, $newPlayer);
@@ -136,8 +145,28 @@ class ArenaManager{
 		$this->config->save();		
 	}
 	
+	/**
+	 * Remove a player from queue 
+	 */
+	public function removePlayerFromQueueOrArena(Player $player){
+		$currentArena = $this->getPlayerArena($player);
+		if($currentArena != null){
+			$currentArena->onPlayerDeath($player);
+			return;
+		}
+		
+		$index = array_search($player, $this->queue);
+		if($index != -1){
+			unset($this->queue[$index]);
+		}
+	}
+	
 	public function getNumberOfArenas(){
 		return count($this->arenas);
+	}
+	
+	public function getNumberOfPlayersInQueue(){
+		return count($this->queue);
 	}
 }
 

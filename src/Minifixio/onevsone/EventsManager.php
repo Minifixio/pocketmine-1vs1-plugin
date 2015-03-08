@@ -9,6 +9,7 @@ use pocketmine\event\entity\EntityDeathEvent;
 use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\player\PlayerJoinEvent;
+use pocketmine\event\player\PlayerQuitEvent;
 
 
 /**
@@ -23,9 +24,11 @@ class EventsManager implements Listener{
 		$this->arenaManager = $arenaManager;
 	}
 	
-	public function onPlayerJoin(PlayerJoinEvent $event){
-		PluginUtils::logOnConsole("a new player as join");
-	}	
+	public function onPlayerQuit(PlayerQuitEvent $event){
+		$player = $event->getPlayer();
+		$this->arenaManager->removePlayerFromQueueOrArena($player);
+		PluginUtils::logOnConsole("Il y a " . $this->arenaManager->getNumberOfPlayersInQueue() . " joueur dans la queue");
+	}
 	
 	public function onPlayerDeath(PlayerDeathEvent $event){
 		$deadPlayer = $event->getEntity();
@@ -33,7 +36,6 @@ class EventsManager implements Listener{
 		if($arena != NULL){
 			$arena->onPlayerDeath($deadPlayer);
 		}
-		
 	}
 }
 
