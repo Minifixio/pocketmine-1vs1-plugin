@@ -166,8 +166,8 @@ class Arena{
    		//Rend une arene active apres un combat
    		$this->active = FALSE;
    		foreach ($this->players as $player){
-   			$player->getInventory()->clearAll();
    			$player->getInventory()->setItemInHand(new Item(Item::AIR,0,0));
+   			$player->getInventory()->clearAll();
    			$player->getInventory()->sendArmorContents($player);
    			$player->getInventory()->sendContents($player);
    			$player->getInventory()->sendHeldItem($player);

@@ -4,12 +4,15 @@ namespace Minifixio\onevsone;
 
 use Minifixio\onevsone\model\Arena;
 use Minifixio\onevsone\utils\PluginUtils;
+use Minifixio\onevsone\model\SignRefreshTask;
+use Minifixio\onevsone\OneVsOne;
 
 use pocketmine\Server;
 use pocketmine\Player;
 use pocketmine\level\Location;
 use pocketmine\level\Position;
 use pocketmine\utils\Config;
+use pocketmine\tile\Sign;
 
 /**
  * Manages PVP arenas
@@ -22,8 +25,14 @@ class ArenaManager{
 	/** @var Player[] **/
 	private $queue = array();	
 	
-	/** @var Config */
+	/** @var Config **/
 	private $config;
+	
+	/** @var Tiles[] **/
+	private $signTiles = array();
+
+	const SIGN_REFRESH_DELAY = 5;
+	private $signRefreshTaskHandler;
 	
 	/**
 	 * Init the arenas
@@ -32,6 +41,12 @@ class ArenaManager{
 		PluginUtils::logOnConsole("Init ArenaManager");
 		$this->parsePositions($arenaPositions);
 		$this->config = $config;
+		
+		// Launch sign refreshing task
+		$task = new SignRefreshTask(OneVsOne::getInstance());
+		$task->arenaManager = $this;
+		$this->signRefreshTaskHandler = Server::getInstance()->getScheduler()->scheduleRepeatingTask($task, self::SIGN_REFRESH_DELAY * 20);
+				
 	}
 	
 	/**
@@ -85,6 +100,7 @@ class ArenaManager{
 		$newPlayer->sendMessage("[1vs1] Il faut minimum 2 joueurs pour commencer un duel.");
 		
 		$this->launchNewRounds();
+		$this->refreshSigns();
 	}
 
 	/**
@@ -159,14 +175,41 @@ class ArenaManager{
 		if($index != -1){
 			unset($this->queue[$index]);
 		}
+		$this->refreshSigns();
 	}
 	
 	public function getNumberOfArenas(){
 		return count($this->arenas);
 	}
 	
+	public function getNumberOfFreeArenas(){
+		$numberOfFreeArenas = count($this->arenas);
+		foreach ($this->arenas as $arena){
+			if($arena->active){
+				$numberOfFreeArenas--;
+			}
+		}
+		return $numberOfFreeArenas;
+	}	
+	
 	public function getNumberOfPlayersInQueue(){
 		return count($this->queue);
+	}
+	
+	/**
+	 * Add a new 1vs1 sign
+	 */
+	public function addSign(Sign $signTile){
+		array_push($this->signTiles, $signTile);
+	}
+	
+	/**
+	 * Refresh all 1vs1 signs
+	 */
+	public function refreshSigns(){
+		foreach ($this->signTiles as $signTile){
+			$signTile->setText('[1vs1]', "-En attente: " . $this->getNumberOfPlayersInQueue(), "-Arenes: " . $this->getNumberOfFreeArenas(), "-+===+-");
+		}
 	}
 }
 

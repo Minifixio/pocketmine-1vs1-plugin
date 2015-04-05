@@ -4,12 +4,18 @@ namespace Minifixio\onevsone;
 
 use Minifixio\onevsone\utils\PluginUtils;
 
+use pocketmine\tile\Tile;
+use pocketmine\item\Item;
+use pocketmine\block\Block;
+use pocketmine\tile\Sign;
+
 use pocketmine\event\Listener;
 use pocketmine\event\entity\EntityDeathEvent;
 use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerQuitEvent;
+use pocketmine\event\block\SignChangeEvent;
 
 
 /**
@@ -19,7 +25,7 @@ class EventsManager implements Listener{
 
 	/** @var ArenaManager */
 	private $arenaManager;
-	
+		
 	public function __construct(ArenaManager $arenaManager){
 		$this->arenaManager = $arenaManager;
 	}
@@ -35,6 +41,25 @@ class EventsManager implements Listener{
 		$arena = $this->arenaManager->getPlayerArena($deadPlayer);
 		if($arena != NULL){
 			$arena->onPlayerDeath($deadPlayer);
+		}
+	}
+	
+	public function tileupdate(SignChangeEvent $event){
+		if($event->getBlock()->getID() == Item::SIGN_POST || $event->getBlock()->getID() == Block::SIGN_POST || $event->getBlock()->getID() == Block::WALL_SIGN){
+			$signTile = $event->getPlayer()->getLevel()->getTile($event->getBlock());
+			if(!($signTile instanceof Sign)){
+				return true;
+			}
+			$signLines = $event->getLines();
+			if($signLines[0]=='[1vs1]'){
+				if($event->getPlayer()->isOp()){
+					$this->arenaManager->addSign($signTile);
+					$event->setLine(1,"-En attente: "  . $this->arenaManager->getNumberOfPlayersInQueue());
+					$event->setLine(2,"-Arenes :" . $this->arenaManager->getNumberOfFreeArenas());
+					$event->setLine("-+===+-");
+					return true;
+				}
+			}
 		}
 	}
 }

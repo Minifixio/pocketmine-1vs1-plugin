@@ -26,7 +26,7 @@ class OneVsOne extends PluginBase{
 	* Plugin is enabled by PocketMine server
 	*/
     public function onEnable(){
-    	
+    	self::$instance = $this;
     	PluginUtils::logOnConsole("Init OneVsOne plugin");
     	
     	// Get arena positions from arenas.yml
@@ -48,8 +48,6 @@ class OneVsOne extends PluginBase{
     	
     	$referenceArenaCommand = new ReferenceArenaCommand($this, $this->arenaManager);
     	$this->getServer()->getCommandMap()->register($referenceArenaCommand->commandName, $referenceArenaCommand);    	
-    	
-    	self::$instance = $this;
     }
     
     public static function getInstance(){
