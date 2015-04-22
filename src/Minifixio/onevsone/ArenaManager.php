@@ -37,22 +37,40 @@ class ArenaManager{
 	/**
 	 * Init the arenas
 	 */
-	public function init($arenaPositions, $config){
+	public function init(Config $config){
 		PluginUtils::logOnConsole("Init ArenaManager");
-		$this->parsePositions($arenaPositions);
 		$this->config = $config;
+		
+		if(!$this->config->arenas){
+			$this->config->set('arenas', []);
+			$arenaPositions = [];
+		}
+		else{
+			$arenaPositions = $this->config->arenas;
+		}
+		
+		if(!$this->config->signs){
+			$this->config->set('signs', []);
+			$signPositions = [];
+		}
+		else{
+			$signPositions = $this->config->signs;
+		}	
+
+		// Load arenas and signs
+		$this->parseArenaPositions($arenaPositions);
+		$this->parseSignPositions($signPositions);
 		
 		// Launch sign refreshing task
 		$task = new SignRefreshTask(OneVsOne::getInstance());
 		$task->arenaManager = $this;
 		$this->signRefreshTaskHandler = Server::getInstance()->getScheduler()->scheduleRepeatingTask($task, self::SIGN_REFRESH_DELAY * 20);
-				
 	}
 	
 	/**
 	 * Create arenas
 	 */
-	public function parsePositions(array $arenaPositions) {
+	public function parseArenaPositions(array $arenaPositions) {
 		foreach ($arenaPositions as $n => $arenaPosition) {
 			Server::getInstance()->loadLevel($arenaPosition[3]);
 			if(($level = Server::getInstance()->getLevelByName($arenaPosition[3])) === null){
@@ -63,6 +81,26 @@ class ArenaManager{
 				$newArena = new Arena($newArenaPosition);
 				array_push($this->arenas, $newArena);
 				Server::getInstance()->getLogger()->debug("Arena " . $n . " loaded at position " . $newArenaPosition->__toString());
+			}
+		}
+	}	
+
+	/**
+	 * Load signs
+	 */
+	public function parseSignPositions(array $signPositions) {
+		foreach ($signPositions as $n => $signPosition) {
+			Server::getInstance()->loadLevel($signPosition[3]);
+			if(($level = Server::getInstance()->getLevelByName($signPosition[3])) !== null){
+				$newSignPosition = new Position($signPosition[0], $signPosition[1], $signPosition[2], $level);
+				$tile = $level->getTile($newSignPosition);
+				
+				// Load it only if it's a sign with OneVsOne title
+				if($tile !== null && $tile instanceof Sign && $tile->getText()[0] == OneVsOne::SIGN_TITLE){
+					array_push($this->signTiles, $tile);
+					Server::getInstance()->getLogger()->debug("New sign added");
+					continue;
+				}
 			}
 		}
 	}	
@@ -157,7 +195,9 @@ class ArenaManager{
 		array_push($this->arenas,$newArena);
 		
 		// Save it to config
-		$this->config->set(count($this->arenas), [$newArena->position->getX(), $newArena->position->getY(), $newArena->position->getZ(), $newArena->position->getLevel()->getName()]);
+		$arenas = $this->config->arenas;
+		array_push($arenas, [$newArena->position->getX(), $newArena->position->getY(), $newArena->position->getZ(), $newArena->position->getLevel()->getName()]);
+		$this->config->set("arenas", $arenas);
 		$this->config->save();		
 	}
 	
@@ -200,6 +240,10 @@ class ArenaManager{
 	 * Add a new 1vs1 sign
 	 */
 	public function addSign(Sign $signTile){
+		$signs = $this->config->signs;
+		$signs[count($this->signTiles)] = [$signTile->getX(), $signTile->getY(), $signTile->getZ(), $signTile->getLevel()->getName()];
+		$this->config->set("signs", $signs);
+		$this->config->save();
 		array_push($this->signTiles, $signTile);
 	}
 	

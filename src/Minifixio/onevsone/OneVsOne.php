@@ -22,6 +22,8 @@ class OneVsOne extends PluginBase{
 	/** @var Config */
 	public $arenaConfig;
 	
+	CONST SIGN_TITLE = '[1vs1]';
+	
 	/**
 	* Plugin is enabled by PocketMine server
 	*/
@@ -31,11 +33,11 @@ class OneVsOne extends PluginBase{
     	
     	// Get arena positions from arenas.yml
     	@mkdir($this->getDataFolder());
-    	$this->arenaConfig = new Config($this->getDataFolder()."arenas.yml", Config::YAML, array());    	
-    	
+    	$this->arenaConfig = new Config($this->getDataFolder()."config.yml", Config::YAML, array());    	
+
     	$this->arenaManager = new ArenaManager();
-    	$this->arenaManager->init($this->arenaConfig->getAll(), $this->arenaConfig);
-    	 
+    	$this->arenaManager->init($this->arenaConfig);
+    	
     	// Register events
     	$this->getServer()->getPluginManager()->registerEvents(
     			new EventsManager($this->arenaManager), 
