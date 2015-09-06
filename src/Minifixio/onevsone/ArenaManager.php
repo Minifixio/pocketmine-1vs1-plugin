@@ -13,6 +13,7 @@ use pocketmine\level\Location;
 use pocketmine\level\Position;
 use pocketmine\utils\Config;
 use pocketmine\tile\Sign;
+use pocketmine\utils\TextFormat;
 
 /**
  * Manages PVP arenas
@@ -38,7 +39,7 @@ class ArenaManager{
 	 * Init the arenas
 	 */
 	public function init(Config $config){
-		PluginUtils::logOnConsole("Init ArenaManager");
+		PluginUtils::logOnConsole("- Init ArenaManager");
 		$this->config = $config;
 		
 		if(!$this->config->arenas){
@@ -74,13 +75,13 @@ class ArenaManager{
 		foreach ($arenaPositions as $n => $arenaPosition) {
 			Server::getInstance()->loadLevel($arenaPosition[3]);
 			if(($level = Server::getInstance()->getLevelByName($arenaPosition[3])) === null){
-				Server::getInstance()->getLogger()->error($arenaPosition[3] . " is not loaded. Arena " . $n . " is disabled.");
+				Server::getInstance()->getLogger()->error("[1vs1] - " . $arenaPosition[3] . " is not loaded. Arena " . $n . " is disabled.");
 			}
 			else{
 				$newArenaPosition = new Position($arenaPosition[0], $arenaPosition[1], $arenaPosition[2], $level);
 				$newArena = new Arena($newArenaPosition);
 				array_push($this->arenas, $newArena);
-				Server::getInstance()->getLogger()->debug("Arena " . $n . " loaded at position " . $newArenaPosition->__toString());
+				Server::getInstance()->getLogger()->debug("[1vs1] - Arena " . $n . " loaded at position " . $newArenaPosition->__toString());
 			}
 		}
 	}	
@@ -89,18 +90,25 @@ class ArenaManager{
 	 * Load signs
 	 */
 	public function parseSignPositions(array $signPositions) {
+		PluginUtils::logOnConsole("[1vs1] - Load signs... " . count($signPositions) . " signs");
 		foreach ($signPositions as $n => $signPosition) {
 			Server::getInstance()->loadLevel($signPosition[3]);
 			if(($level = Server::getInstance()->getLevelByName($signPosition[3])) !== null){
 				$newSignPosition = new Position($signPosition[0], $signPosition[1], $signPosition[2], $level);
 				$tile = $level->getTile($newSignPosition);
-				
-				// Load it only if it's a sign with OneVsOne title
-				if($tile !== null && $tile instanceof Sign && $tile->getText()[0] == OneVsOne::SIGN_TITLE){
-					array_push($this->signTiles, $tile);
-					Server::getInstance()->getLogger()->debug("New sign added");
-					continue;
+				if($tile != null){
+					$cleanTileTitle = TextFormat::clean($tile->getText()[0]);
+					$cleanOnevsOneTitle = TextFormat::clean(OneVsOne::SIGN_TITLE);
+					
+					// Load it only if it's a sign with OneVsOne title
+					if($tile !== null && $tile instanceof Sign && $cleanTileTitle === $cleanOnevsOneTitle){
+						array_push($this->signTiles, $tile);
+						continue;
+					}
 				}
+			}
+			else{
+				PluginUtils::logOnConsole("[1vs1] - Level " . $signPosition[3] . " does not exists. Please check configuration." );
 			}
 		}
 	}	
@@ -112,30 +120,25 @@ class ArenaManager{
 		
 		// Check that player is not already in the queue
 		if(in_array($newPlayer, $this->queue)){
-			$newPlayer->sendMessage(" ");
-			$newPlayer->sendMessage("[1vs1] Vous etes deja dans la file d'attente.");
-			$newPlayer->sendMessage(" ");
+			PluginUtils::sendDefaultMessage($newPlayer, "You are already in the queue.");
 			return;
 		}
 		
 		// Check that player is not currently in an arena
 		$currentArena = $this->getPlayerArena($newPlayer);
 		if($currentArena != null){
-			$newPlayer->sendMessage(" ");
-			$newPlayer->sendMessage("[1vs1] Vous etes deja dans une arene");
-			$newPlayer->sendMessage(" ");				
+			PluginUtils::sendDefaultMessage($newPlayer, "You are already in a arena");
 			return;
 		}
 		
 		// add player to queue
-		PluginUtils::logOnConsole("Adding " . $newPlayer->getName() . " to queue");
 		array_push($this->queue, $newPlayer);
 		
 		// display some stats
-		PluginUtils::logOnConsole("There is actually " . count($this->queue) . " players in the queue");
-		$newPlayer->sendMessage("[1vs1] Vous avez rejoins la file d'attente.");
-		$newPlayer->sendMessage("[1vs1] Il y a " . count($this->queue) . " joueurs en attente.");
-		$newPlayer->sendMessage("[1vs1] Il faut minimum 2 joueurs pour commencer un duel.");
+		PluginUtils::logOnConsole("[1vs1] - There is actually " . count($this->queue) . " players in the queue");
+		PluginUtils::sendDefaultMessage($newPlayer, "You've joined the 1vs1 queue");
+		PluginUtils::sendDefaultMessage($newPlayer, "There are " . count($this->queue) . " players waiting");
+		$newPlayer->sendTip(TextFormat::RED . "» You've joined the 1vs1 queue");
 		
 		$this->launchNewRounds();
 		$this->refreshSigns();
@@ -148,7 +151,6 @@ class ArenaManager{
 		
 		// Check that there is at least 2 players in the queue
 		if(count($this->queue) < 2){
-			PluginUtils::logOnConsole("There is not enought players in the queue.");
 			return;
 		}
 		
@@ -158,7 +160,6 @@ class ArenaManager{
 			$arena = next($this->arenas);
 		}
 		if($arena == FALSE){
-			PluginUtils::logOnConsole("There are no free arenas." );
 			return;
 		}
 		
@@ -252,10 +253,14 @@ class ArenaManager{
 	 */
 	public function refreshSigns(){
 		foreach ($this->signTiles as $signTile){
-			$signTile->setText('[1vs1]', "-En attente: " . $this->getNumberOfPlayersInQueue(), "-Arenes: " . $this->getNumberOfFreeArenas(), "-+===+-");
+			if($signTile->level != null){
+				
+				$signTile->setText(OneVsOne::SIGN_TITLE, "-Waiting " . $this->getNumberOfPlayersInQueue(), "-Arenas: " . $this->getNumberOfFreeArenas(), "-+===+-");
+			}
 		}
 	}
 }
+
 
 
 

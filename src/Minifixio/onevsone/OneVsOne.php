@@ -10,6 +10,8 @@ use Minifixio\onevsone\utils\PluginUtils;
 use Minifixio\onevsone\command\JoinCommand;
 use Minifixio\onevsone\command\ReferenceArenaCommand;
 use pocketmine\utils\Config;
+use pocketmine\utils\TextFormat;
+
 
 class OneVsOne extends PluginBase{
 	
@@ -29,7 +31,7 @@ class OneVsOne extends PluginBase{
 	*/
     public function onEnable(){
     	self::$instance = $this;
-    	PluginUtils::logOnConsole("Init OneVsOne plugin");
+    	PluginUtils::logOnConsole(TextFormat::GREEN . "[1vs1] - Init OneVsOne plugin");
     	
     	// Get arena positions from arenas.yml
     	@mkdir($this->getDataFolder());

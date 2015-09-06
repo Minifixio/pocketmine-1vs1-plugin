@@ -16,6 +16,7 @@ use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\block\SignChangeEvent;
+use pocketmine\utils\TextFormat;
 
 
 /**
@@ -33,7 +34,6 @@ class EventsManager implements Listener{
 	public function onPlayerQuit(PlayerQuitEvent $event){
 		$player = $event->getPlayer();
 		$this->arenaManager->removePlayerFromQueueOrArena($player);
-		PluginUtils::logOnConsole("Il y a " . $this->arenaManager->getNumberOfPlayersInQueue() . " joueur dans la queue");
 	}
 	
 	public function onPlayerDeath(PlayerDeathEvent $event){
@@ -56,8 +56,8 @@ class EventsManager implements Listener{
 			if($signLines[0]== OneVsOne::SIGN_TITLE){
 				if($event->getPlayer()->isOp()){
 					$this->arenaManager->addSign($signTile);
-					$event->setLine(1,"-En attente: "  . $this->arenaManager->getNumberOfPlayersInQueue());
-					$event->setLine(2,"-Arenes :" . $this->arenaManager->getNumberOfFreeArenas());
+					$event->setLine(1,"-Waiting: "  . $this->arenaManager->getNumberOfPlayersInQueue());
+					$event->setLine(2,"-Arenas:" . $this->arenaManager->getNumberOfFreeArenas());
 					$event->setLine(3,"-+===+-");
 					return true;
 				}

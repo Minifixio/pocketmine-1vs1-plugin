@@ -3,6 +3,8 @@
 namespace Minifixio\onevsone\utils;
 
 use pocketmine\Server;
+use pocketmine\utils\TextFormat;
+
 
 /**
  * Utility methods for my plugin
@@ -16,15 +18,9 @@ class PluginUtils{
 		$logger = Server::getInstance()->getLogger();
 		$logger->info("[1vs1] " . $message);
 	}
-	
-	/**
-	 * Send message with previous empty lines
-	 */
-	public static function sendMessageWithSpaces($player,$message,$nbSpace = 1){
-		for ($i=0; $i<$nbSpace; $i++){
-			$player->sendMessage(" ");
-		}
-		$player->sendMessage("[1vs1] " . $message);
+
+	public static function sendDefaultMessage($player, $message){
+		$player->sendMessage(TextFormat::GOLD . TextFormat::BOLD . "[1vs1] " . TextFormat::WHITE . $message);
 	}
 }
 

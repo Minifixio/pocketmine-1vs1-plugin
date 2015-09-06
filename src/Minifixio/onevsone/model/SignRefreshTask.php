@@ -3,6 +3,8 @@
 namespace Minifixio\onevsone\model;
 
 use pocketmine\scheduler\PluginTask;
+use pocketmine\utils\TextFormat;
+
 
 class SignRefreshTask extends PluginTask{
 	

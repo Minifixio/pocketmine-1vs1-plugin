@@ -37,18 +37,20 @@ class ReferenceArenaCommand extends Command {
 		}
 
 		if(!$sender instanceof Player){
-			$sender->sendMessage("Utiliser la commande dans le jeu");
+			$sender->sendMessage("Please use the command in-game");
 			return true;
 		}
 		
 		// Get current op location
 		$playerLocation = $sender->getLocation();
 		
+		$this->plugin->getLogger()->info("location" . $sender->getLocation());
+		
 		// Add the arena
 		$this->arenaManager->referenceNewArena($playerLocation);
 		
 		// Notify the op
-		$sender->sendMessage("Une nouvelle arene a été crée ! Il y a " . $this->arenaManager->getNumberOfArenas() ." arene.");
+		$sender->sendMessage("[1vs1] A new arena has been created at your position ! There are " . $this->arenaManager->getNumberOfArenas() ." arenas.");
 		
 		return true;
 	}

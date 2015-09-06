@@ -9,6 +9,9 @@ use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\level\Position;
 use pocketmine\item\Item;
+use pocketmine\utils\TextFormat;
+use pocketmine\entity\Effect;
+use pocketmine\entity\InstantEffect;
 
 use \DateTime;
 
@@ -19,18 +22,19 @@ class Arena{
 	public $startTime;
 	
 	public $players = array();
-
+	
 	/** @var Position */
 	public $position;
 	
-	//Durée du round en seconde (= 3min )
-	const ROUND_DURATION = 30;
+	// Roound duration (3min)
+	const ROUND_DURATION = 180;
 	
-	const PLAYER_1_OFFSET_X = 6;
+	const PLAYER_1_OFFSET_X = 5;
 	const PLAYER_2_OFFSET_X = -5;
 	
-	//Variable permettant d'arreter le timer du round
+	// Variable for stop the round's timer
 	private $taskHandler;
+	private $countdownTaskHandler;
 
 	/**
 	 * Build a new Arena
@@ -46,73 +50,99 @@ class Arena{
 	 * @param Player[] $players
 	 */
 	public function startRound(array $players){
+		
+		// Set active to prevent new players
+		$this->active = TRUE;
+		
+		// Set players
 		$this->players = $players;
 		$player1 = $players[0];
 		$player2 = $players[1];
+		
+		$player1->sendMessage(TextFormat::BOLD . TextFormat::RED . ">> Duel against " . TextFormat::GOLD . $player2->getName());
+		$player2->sendMessage(TextFormat::BOLD . TextFormat::RED . ">> Duel against " . TextFormat::GOLD . $player1->getName());
+
+		// Create a new countdowntask
+		$task = new CountDownToDuelTask(OneVsOne::getInstance(), $this);
+		$this->countdownTaskHandler = Server::getInstance()->getScheduler()->scheduleDelayedRepeatingTask($task, 20, 20);	
+	}
+	
+	/**
+	 * Really starts the duel after countdown
+	 */
+	public function startDuel(){
+		
+		Server::getInstance()->getScheduler()->cancelTask($this->countdownTaskHandler->getTaskId());
+		
+		$player1 = $this->players[0];
+		$player2 = $this->players[1];
 		
 		$pos_player1 = Position::fromObject($this->position, $this->position->getLevel());
 		$pos_player1->x += self::PLAYER_1_OFFSET_X;
 		
 		$pos_player2 = Position::fromObject($this->position, $this->position->getLevel());
 		$pos_player2->x += self::PLAYER_2_OFFSET_X;
-		
-		//Teleport le premier joueur
 		$player1->teleport($pos_player1, 90, 0);
-		
-		//Teleport le deuxieme joueur
 		$player2->teleport($pos_player2, -90, 0);
 		
-		//Donne kit
-		foreach ($players as $player){
+		// Give kit
+		foreach ($this->players as $player){
 			$this->giveKit($player);
 		}
 		
-		//Fixe l'heure de debut
+		// Fix start time
 		$this->startTime = new DateTime('now');
-		$this->active = TRUE;
 		
+		$player1->sendTip(TextFormat::RED . "You are strarting a duel !");
 		$player1->sendMessage(" ");
-		$player1->sendMessage("++++++++=++++++++");
-		$player1->sendMessage(">> Vous commencez un duel contre : " . $player2->getName() . " !");
-		$player1->sendMessage(">> Vous avez 3 min !");
-		$player1->sendMessage(">> Bonne chance !");
-		$player1->sendMessage("++++++++=++++++++");
+		$player1->sendMessage(TextFormat::RED . TextFormat::BOLD . "++++++++=++++++++");
+		$player1->sendMessage(TextFormat::AQUA . ">". TextFormat::RESET . " You're starting a duel against : " . $player2->getName() . " !");
+		$player1->sendMessage(TextFormat::AQUA . ">". TextFormat::RESET . " You have 3min !");
+		$player1->sendMessage(TextFormat::AQUA . ">". TextFormat::RESET . " Good luck :) !");
+		$player1->sendMessage(TextFormat::RED . TextFormat::BOLD . "++++++++=++++++++");
 		$player1->sendMessage(" ");
 		
+		$player1->sendTip(TextFormat::RED . "You are strarting a duel !");
 		$player2->sendMessage(" ");
-		$player2->sendMessage("++++++++=++++++++");
-		$player2->sendMessage(">> Vous commencez un duel contre : " . $player1->getName() . " !");
-		$player2->sendMessage(">> Vous avez 3 min !");
-		$player2->sendMessage(">> Bonne chance !");
-		$player2->sendMessage("++++++++=++++++++");
+		$player2->sendMessage(TextFormat::RED . TextFormat::BOLD . "++++++++=++++++++");
+		$player2->sendMessage(TextFormat::AQUA . ">". TextFormat::RESET ." You're starting a duel against : " . $player1->getName() . " !");
+		$player2->sendMessage(TextFormat::AQUA . ">". TextFormat::RESET ." You have 3min !");
+		$player2->sendMessage(TextFormat::AQUA . ">". TextFormat::RESET ." Good luck :) !");
+		$player2->sendMessage(TextFormat::RED . TextFormat::BOLD . "++++++++=++++++++");
 		$player2->sendMessage(" ");
 		
-		
-		
-		//Lance la tache de cloture du round
+		// Launch the end round task
 		$task = new RoundCheckTask(OneVsOne::getInstance());
 		$task->arena = $this;
 		$this->taskHandler = Server::getInstance()->getScheduler()->scheduleDelayedTask($task, self::ROUND_DURATION * 20);
-		
+	}
+	
+	/**
+	 * Abort duel during countdown if one of the players has quit
+	 */
+	public function abortDuel(){
+		Server::getInstance()->getScheduler()->cancelTask($this->countdownTaskHandler->getTaskId());
 	}
 	
 	private function giveKit(Player $player){
-		//Vide l'inventaire
+		// Clear inventory
 		$player->getInventory()->clearAll();
 		
-		//Donne une epee , armure et nourriture
-		$player->getInventory()->addItem(Item::get(267, 0, 1));
-		$player->getInventory()->addItem(Item::get(297, 0, 5));
+		// Give sword, food and armor
+		$player->getInventory()->addItem(Item::get(ITEM::IRON_SWORD));
+		$player->getInventory()->addItem(Item::get(ITEM::BREAD));
+		$player->getInventory()->setItemInHand(Item::get(ITEM::IRON_SWORD), $player);
 		
-		//Met l'armure sur lui
+		// Pur the armor on the player
 		$player->getInventory()->setHelmet(Item::get(302, 0, 1));
 		$player->getInventory()->setChestplate(Item::get(303, 0, 1));
 		$player->getInventory()->setLeggings(Item::get(304, 0, 1));
 		$player->getInventory()->setBoots(Item::get(305, 0, 1));
 		$player->getInventory()->sendArmorContents($player);
 		
-		//On lui redonne toute sa vie
+		// Set his life to 20
 		$player->setHealth(20);
+		$player->removeAllEffects();
 
    }
    
@@ -122,40 +152,33 @@ class Arena{
     */
    public function onPlayerDeath(Player $loser){
    	
-		//Finit le duel et teleporte le gagnant au spawn	
+		// Finish the duel and teleport the winner at spawn
    		if($loser == $this->players[0]){
    			$winner = $this->players[1];
    		}
    		else{
    			$winner = $this->players[0];
    		}  		
+   		$loser->sendMessage(TextFormat::RED . TextFormat::BOLD . "++++++++=++++++++");
+   		$loser->sendMessage(TextFormat::AQUA . "> You've lost the duel against " . $winner->getName() . " !");
+   		$loser->sendMessage(TextFormat::AQUA . "> Try again next time !");
+   		$loser->sendMessage(TextFormat::RED . TextFormat::BOLD . "++++++++=++++++++");
+   		$loser->removeAllEffects();
+   		$loser->addEffect(Effect::getEffect($this->effect)->setAmplifier(3)->setDuration(999999));
    		
-   		$loser->sendMessage("++++++++=++++++++");
-   		$loser->sendMessage(">> Vous avez perdu le duel contre" . $winner->getName() . " !");
-   		$loser->sendMessage(">> Retentez votre chance la prochaine fois !");
-   		$loser->sendMessage("++++++++=++++++++");
-   		 
+   		$winner->sendMessage(TextFormat::RED . TextFormat::BOLD . "++++++++=++++++++");
+   		$winner->sendMessage(TextFormat::AQUA . ">> You've won the duel against " . $loser->getName() . " !");
+   		$winner->sendMessage(TextFormat::AQUA . ">> You won with " . $winner->getHealth() . " of health !");
+   		$winner->sendMessage(TextFormat::RED . TextFormat::BOLD . "++++++++=++++++++");
    		
-   		$winner->sendMessage("++++++++=++++++++");
-   		$winner->sendMessage(">> Vous avez gangné le duel contre : " . $loser->getName() . " !");
-   		$winner->sendMessage(">> Vous avez gagné avec " . $winner->getHealth() . " de vie !");
-   		$winner->sendMessage("+1 coins");
-   		$winner->sendMessage("+1 kill");
-   		$winner->sendMessage("++++++++=++++++++");
-
-   		//On teleporte le gagnant au spawn
+   		// Teleport the winner at spawn
    		$winner->teleport($winner->getSpawn());
 
-   		//On lui redonne toute sa vie
+   		// Set his life to 20
    		$winner->setHealth(20);
+   		Server::getInstance()->broadcastMessage(TextFormat::GREEN . TextFormat::BOLD . "» " . TextFormat::GOLD . $winner->getName() . TextFormat::WHITE . " won a duel against " . TextFormat::RED . $loser->getName() . TextFormat::WHITE . " !");
    		
-   		Server::getInstance()->broadcastMessage("-> " . $winner->getName() . " a gagné un duel contre " . $loser->getName() . " !");
-   		
-   		
-   		//On lui ajoute des points et des coins
-   		//TODO:Lui donner des points de victoires
-
-   		//On reset l'arene
+   		// Reset arena
    		$this->reset();
    }
 
@@ -163,7 +186,7 @@ class Arena{
     * Reset the Arena to current state
     */
    private function reset(){
-   		//Rend une arene active apres un combat
+   		// Put active a rena after the duel
    		$this->active = FALSE;
    		foreach ($this->players as $player){
    			$player->getInventory()->setItemInHand(new Item(Item::AIR,0,0));
@@ -174,7 +197,9 @@ class Arena{
    		}
    		$this->players = array();
    		$this->startTime = NULL;
-   		Server::getInstance()->getScheduler()->cancelTask($this->taskHandler->getTaskId());
+   		if($this->taskHandler != NULL){
+   			Server::getInstance()->getScheduler()->cancelTask($this->taskHandler->getTaskId());
+   		}
    }
    
    /**
@@ -182,8 +207,8 @@ class Arena{
     * @param Player $loser
     */
    public function onPlayerQuit(Player $loser){
-   		//Finit le duel quand un joueur quitte
-   		//Tout est fait par la fonction onPlayerDeath ( voir plus haut )
+   		// Finish the duel when a player quit
+   		// With onPlayerDeath() function
    		$this->onPlayerDeath();
    }
    
@@ -193,15 +218,14 @@ class Arena{
    public function onRoundEnd(){
    		foreach ($this->players as $player){
    			$player->teleport($player->getSpawn());
-   			$player->sendMessage(" ");
-   			$player->sendMessage("++++++++=++++++++");
-   			$player->sendMessage(">> Temps de jeu dépassé. Duel arreté, pas de vainqueur !");
-   			$player->sendMessage(">> Soyez plus rapide la prochaine fois.");       
-   			$player->sendMessage("++++++++=++++++++");
-   			$player->sendMessage(" ");
+   			$player->sendMessage(TextFormat::RED . TextFormat::BOLD . "++++++++=++++++++");
+   			$player->sendMessage(TextFormat::AQUA . "> Playing time over, no winners !");
+   			$player->sendMessage(TextFormat::AQUA . "> Be faster next time !");  
+   			$player->sendMessage(TextFormat::RED . TextFormat::BOLD . "++++++++=++++++++");
+   			$player->removeAllEffects();
    		}
    		
-   		//On reset l'arene
+   		// Reset arena
    		$this->reset();   		
 	 }
 	 

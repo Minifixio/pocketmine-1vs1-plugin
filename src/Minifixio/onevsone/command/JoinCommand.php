@@ -8,6 +8,8 @@ use pocketmine\command\CommandSender;
 use pocketmine\level\Level;
 use pocketmine\Player;
 use pocketmine\Server;
+use pocketmine\utils\TextFormat;
+
 
 use Minifixio\onevsone\OneVsOne;
 use Minifixio\onevsone\ArenaManager;
@@ -19,7 +21,7 @@ class JoinCommand extends Command implements PluginIdentifiableCommand{
 	public $commandName = "match";
 
 	public function __construct(OneVsOne $plugin, ArenaManager $arenaManager){
-		parent::__construct($this->commandName, "Rejoins la file d'attente 1vs1.");
+		parent::__construct($this->commandName, "Join 1vs1 queue !");
 		$this->setUsage("/$this->commandName");
 		
 		$this->plugin = $plugin;
@@ -36,7 +38,7 @@ class JoinCommand extends Command implements PluginIdentifiableCommand{
 		}
 
 		if(!$sender instanceof Player){
-			$sender->sendMessage("Utiliser la commande dans le jeu");
+			$sender->sendMessage("Please use the command in-game");
 			return true;
 		}
 		

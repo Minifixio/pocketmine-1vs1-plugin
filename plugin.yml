@@ -2,4 +2,4 @@ name: 1vs1
 main: Minifixio\onevsone\OneVsOne
 version: 0.0.1
 api: [1.0.0, 1.1.0]
-description: 1vs1 Plugin pour PvP
+description: 1vs1 Plugin
