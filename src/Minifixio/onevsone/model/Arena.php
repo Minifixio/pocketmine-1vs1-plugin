@@ -164,7 +164,6 @@ class Arena{
    		$loser->sendMessage(TextFormat::AQUA . "> Try again next time !");
    		$loser->sendMessage(TextFormat::RED . TextFormat::BOLD . "++++++++=++++++++");
    		$loser->removeAllEffects();
-   		$loser->addEffect(Effect::getEffect($this->effect)->setAmplifier(3)->setDuration(999999));
    		
    		$winner->sendMessage(TextFormat::RED . TextFormat::BOLD . "++++++++=++++++++");
    		$winner->sendMessage(TextFormat::AQUA . ">> You've won the duel against " . $loser->getName() . " !");
