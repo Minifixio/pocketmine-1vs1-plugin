@@ -14,6 +14,7 @@ use pocketmine\entity\Effect;
 use pocketmine\entity\InstantEffect;
 
 use \DateTime;
+use Minifixio\onevsone\ArenaManager;
 
 class Arena{
 
@@ -25,6 +26,9 @@ class Arena{
 	
 	/** @var Position */
 	public $position;
+	
+	/** @var ArenaManager */
+	private $manager;
 	
 	// Roound duration (3min)
 	const ROUND_DURATION = 180;
@@ -40,8 +44,9 @@ class Arena{
 	 * Build a new Arena
 	 * @param Position position Base position of the Arena
 	 */
-	public function __construct($position){
+	public function __construct($position, ArenaManager $manager){
 		$this->position = $position;
+		$this->manager = $manager;
 		$this->active = FALSE;
 	}
 	
@@ -198,6 +203,7 @@ class Arena{
    		$this->startTime = NULL;
    		if($this->taskHandler != NULL){
    			Server::getInstance()->getScheduler()->cancelTask($this->taskHandler->getTaskId());
+   			$this->manager->notifyEndOfRound($this);
    		}
    }
    

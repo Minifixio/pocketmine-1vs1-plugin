@@ -79,7 +79,7 @@ class ArenaManager{
 			}
 			else{
 				$newArenaPosition = new Position($arenaPosition[0], $arenaPosition[1], $arenaPosition[2], $level);
-				$newArena = new Arena($newArenaPosition);
+				$newArena = new Arena($newArenaPosition, $this);
 				array_push($this->arenas, $newArena);
 				Server::getInstance()->getLogger()->debug("[1vs1] - Arena " . $n . " loaded at position " . $newArenaPosition->__toString());
 			}
@@ -151,23 +151,39 @@ class ArenaManager{
 		
 		// Check that there is at least 2 players in the queue
 		if(count($this->queue) < 2){
+			PluginUtils::logOnConsole("There is not enough players to start a duel : " . count($this->queue));
 			return;
 		}
 		
 		// Check if there is any arena free (not active)
-		$arena = $this->arenas[0];
-		while ($arena !== FALSE && $arena->active) {
-			$arena = next($this->arenas);
+		Server::getInstance()->getLogger()->debug("Check ".  count($this->arenas) . " arenas");
+		
+		$freeArena = NULL;
+		foreach ($this->arenas as $arena){
+			if(!$arena->active){
+				$freeArena = $arena;
+				break;
+			}
 		}
-		if($arena == FALSE){
+		
+		if($freeArena == NULL){
+			PluginUtils::logOnConsole("No free arena found");
 			return;
 		}
 		
 		// Send the players into the arena (and remove them from queues)
 		$roundPlayers = array();
 		array_push($roundPlayers, array_shift($this->queue), array_shift($this->queue));
-		PluginUtils::logOnConsole("" . implode($roundPlayers));
-		$arena->startRound($roundPlayers);
+		PluginUtils::logOnConsole("Starting duel : " . $roundPlayers[0]->getName() . " vs " . $roundPlayers[1]->getName());
+		$freeArena->startRound($roundPlayers);
+	}
+	
+	/**
+	 * Allows to be notify whan round ends
+	 * @param Arena $arena
+	 */
+	public function notifyEndOfRound(Arena $arena){
+		$this->launchNewRounds();
 	}
 	
 	/**
@@ -190,7 +206,7 @@ class ArenaManager{
 	 */
 	public function referenceNewArena(Location $location){
 		// Create a new arena
-		$newArena = new Arena($location);	
+		$newArena = new Arena($location, $this);	
 		
 		// Add it to the array
 		array_push($this->arenas,$newArena);
