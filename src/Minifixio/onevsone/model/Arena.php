@@ -5,6 +5,7 @@ namespace Minifixio\onevsone\model;
 use Minifixio\onevsone\OneVsOne;
 use Minifixio\onevsone\utils\PluginUtils;
 
+use pocketmine\Plugin;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\level\Position;
@@ -169,7 +170,18 @@ class Arena{
    		$winner->sendMessage(TextFormat::AQUA . ">> You've won the duel against " . $loser->getName() . " !");
    		$winner->sendMessage(TextFormat::AQUA . ">> You won with " . $winner->getHealth() . " of health !");
    		$winner->sendMessage(TextFormat::RED . TextFormat::BOLD . "++++++++=++++++++");
-   		
+   		//maybe idk u dont have to add this just a suggestion
+   		//you can do rest ;P
+   		/*   		if($this->getServer()->getPluginManager()->getPlugin("EconomyAPI") === null && //config stuff here for if money support is enabled){
+   			//do nothing
+   		}else{
+   		$money = /*add config*/   	
+   		/* $this->getServer()->getPluginManager()->getPlugin("EconomyAPI")->addMoney($winner->getName(), $money);	
+   		$winner->sendMessage('message ;P');
+   		TODO: add pocketmoney, masseecnomy support
+   		i didnt add them becuase EconomyAPI is better/more used
+   		}*/
+   		//also add money support
    		// Teleport the winner at spawn
    		$winner->teleport($winner->getSpawn());
 
