@@ -120,14 +120,14 @@ class ArenaManager{
 		
 		// Check that player is not already in the queue
 		if(in_array($newPlayer, $this->queue)){
-			PluginUtils::sendDefaultMessage($newPlayer, "You are already in the queue.");
+			PluginUtils::sendDefaultMessage($newPlayer, OneVsOne::getMessage("queue_alreadyinqueue"));
 			return;
 		}
 		
 		// Check that player is not currently in an arena
 		$currentArena = $this->getPlayerArena($newPlayer);
 		if($currentArena != null){
-			PluginUtils::sendDefaultMessage($newPlayer, "You are already in a arena");
+			PluginUtils::sendDefaultMessage($newPlayer, OneVsOne::getMessage("arena_alreadyinarena"));
 			return;
 		}
 		
@@ -136,9 +136,9 @@ class ArenaManager{
 		
 		// display some stats
 		PluginUtils::logOnConsole("[1vs1] - There is actually " . count($this->queue) . " players in the queue");
-		PluginUtils::sendDefaultMessage($newPlayer, "You've joined the 1vs1 queue");
-		PluginUtils::sendDefaultMessage($newPlayer, "There are " . count($this->queue) . " players waiting");
-		$newPlayer->sendTip(TextFormat::RED . "» You've joined the 1vs1 queue");
+		PluginUtils::sendDefaultMessage($newPlayer, OneVsOne::getMessage("queue_join"));
+		PluginUtils::sendDefaultMessage($newPlayer, OneVsOne::getMessage("queue_playersinqueue"). count($this->queue));
+		$newPlayer->sendTip(OneVsOne::getMessage("queue_popup"));
 		
 		$this->launchNewRounds();
 		$this->refreshSigns();
@@ -151,7 +151,7 @@ class ArenaManager{
 		
 		// Check that there is at least 2 players in the queue
 		if(count($this->queue) < 2){
-			PluginUtils::logOnConsole("There is not enough players to start a duel : " . count($this->queue));
+			Server::getInstance()->getLogger()->debug("There is not enough players to start a duel : " . count($this->queue));
 			return;
 		}
 		
@@ -167,14 +167,14 @@ class ArenaManager{
 		}
 		
 		if($freeArena == NULL){
-			PluginUtils::logOnConsole("No free arena found");
+			Server::getInstance()->getLogger()->debug("[1vs1] - No free arena found");
 			return;
 		}
 		
 		// Send the players into the arena (and remove them from queues)
 		$roundPlayers = array();
 		array_push($roundPlayers, array_shift($this->queue), array_shift($this->queue));
-		PluginUtils::logOnConsole("Starting duel : " . $roundPlayers[0]->getName() . " vs " . $roundPlayers[1]->getName());
+		Server::getInstance()->getLogger()->debug("[1vs1] - Starting duel : " . $roundPlayers[0]->getName() . " vs " . $roundPlayers[1]->getName());
 		$freeArena->startRound($roundPlayers);
 	}
 	

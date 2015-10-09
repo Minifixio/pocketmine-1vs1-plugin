@@ -64,8 +64,8 @@ class Arena{
 		$player1 = $players[0];
 		$player2 = $players[1];
 		
-		$player1->sendMessage(TextFormat::BOLD . TextFormat::RED . ">> Duel against " . TextFormat::GOLD . $player2->getName());
-		$player2->sendMessage(TextFormat::BOLD . TextFormat::RED . ">> Duel against " . TextFormat::GOLD . $player1->getName());
+		$player1->sendMessage(OneVsOne::getMessage("duel_against") . $player2->getName());
+		$player2->sendMessage(OneVsOne::getMessage("duel_against") . $player1->getName());
 
 		// Create a new countdowntask
 		$task = new CountDownToDuelTask(OneVsOne::getInstance(), $this);
@@ -98,23 +98,11 @@ class Arena{
 		// Fix start time
 		$this->startTime = new DateTime('now');
 		
-		$player1->sendTip(TextFormat::RED . "You are strarting a duel !");
-		$player1->sendMessage(" ");
-		$player1->sendMessage(TextFormat::RED . TextFormat::BOLD . "++++++++=++++++++");
-		$player1->sendMessage(TextFormat::AQUA . ">". TextFormat::RESET . " You're starting a duel against : " . $player2->getName() . " !");
-		$player1->sendMessage(TextFormat::AQUA . ">". TextFormat::RESET . " You have 3min !");
-		$player1->sendMessage(TextFormat::AQUA . ">". TextFormat::RESET . " Good luck :) !");
-		$player1->sendMessage(TextFormat::RED . TextFormat::BOLD . "++++++++=++++++++");
-		$player1->sendMessage(" ");
+		$player1->sendTip(OneVsOne::getMessage("duel_tip"));
+		$player1->sendMessage(OneVsOne::getMessage("duel_start"));
 		
-		$player1->sendTip(TextFormat::RED . "You are strarting a duel !");
-		$player2->sendMessage(" ");
-		$player2->sendMessage(TextFormat::RED . TextFormat::BOLD . "++++++++=++++++++");
-		$player2->sendMessage(TextFormat::AQUA . ">". TextFormat::RESET ." You're starting a duel against : " . $player1->getName() . " !");
-		$player2->sendMessage(TextFormat::AQUA . ">". TextFormat::RESET ." You have 3min !");
-		$player2->sendMessage(TextFormat::AQUA . ">". TextFormat::RESET ." Good luck :) !");
-		$player2->sendMessage(TextFormat::RED . TextFormat::BOLD . "++++++++=++++++++");
-		$player2->sendMessage(" ");
+		$player2->sendTip(OneVsOne::getMessage("duel_tip"));
+		$player2->sendMessage(OneVsOne::getMessage("duel_start"));
 		
 		// Launch the end round task
 		$task = new RoundCheckTask(OneVsOne::getInstance());
@@ -164,23 +152,18 @@ class Arena{
    		else{
    			$winner = $this->players[0];
    		}  		
-   		$loser->sendMessage(TextFormat::RED . TextFormat::BOLD . "++++++++=++++++++");
-   		$loser->sendMessage(TextFormat::AQUA . "> You've lost the duel against " . $winner->getName() . " !");
-   		$loser->sendMessage(TextFormat::AQUA . "> Try again next time !");
-   		$loser->sendMessage(TextFormat::RED . TextFormat::BOLD . "++++++++=++++++++");
+   		$loser->sendMessage(OneVsOne::getMessage("duel_loser") . $winner->getName());
    		$loser->removeAllEffects();
    		
-   		$winner->sendMessage(TextFormat::RED . TextFormat::BOLD . "++++++++=++++++++");
-   		$winner->sendMessage(TextFormat::AQUA . ">> You've won the duel against " . $loser->getName() . " !");
-   		$winner->sendMessage(TextFormat::AQUA . ">> You won with " . $winner->getHealth() . " of health !");
-   		$winner->sendMessage(TextFormat::RED . TextFormat::BOLD . "++++++++=++++++++");
+   		$winner->sendMessage( OneVsOne::getMessage("duel_winner") . $loser->getName());
+   		$winner->removeAllEffects();
    		
    		// Teleport the winner at spawn
    		$winner->teleport($winner->getSpawn());
 
    		// Set his life to 20
    		$winner->setHealth(20);
-   		Server::getInstance()->broadcastMessage(TextFormat::GREEN . TextFormat::BOLD . "» " . TextFormat::GOLD . $winner->getName() . TextFormat::WHITE . " won a duel against " . TextFormat::RED . $loser->getName() . TextFormat::WHITE . " !");
+   		Server::getInstance()->broadcastMessage(TextFormat::GREEN . TextFormat::BOLD . "» " . TextFormat::GOLD . $winner->getName() . TextFormat::WHITE . OneVsOne::getMessage("duel_broadcast") . TextFormat::RED . $loser->getName() . TextFormat::WHITE . " !");
    		
    		// Reset arena
    		$this->reset();
@@ -223,10 +206,9 @@ class Arena{
    public function onRoundEnd(){
    		foreach ($this->players as $player){
    			$player->teleport($player->getSpawn());
-   			$player->sendMessage(TextFormat::RED . TextFormat::BOLD . "++++++++=++++++++");
-   			$player->sendMessage(TextFormat::AQUA . "> Playing time over, no winners !");
-   			$player->sendMessage(TextFormat::AQUA . "> Be faster next time !");  
-   			$player->sendMessage(TextFormat::RED . TextFormat::BOLD . "++++++++=++++++++");
+   			$player->sendMessage(TextFormat::BOLD . "++++++++=++++++++");
+   			$player->sendMessage(OneVsOne::getMessage("duel_timeover"));
+   			$player->sendMessage(TextFormat::BOLD . "++++++++=++++++++");
    			$player->removeAllEffects();
    		}
    		
