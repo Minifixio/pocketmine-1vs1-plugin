@@ -179,7 +179,7 @@ class ArenaManager{
 	}
 	
 	/**
-	 * Allows to be notify whan round ends
+	 * Allows to be notify when round ends
 	 * @param Arena $arena
 	 */
 	public function notifyEndOfRound(Arena $arena){
