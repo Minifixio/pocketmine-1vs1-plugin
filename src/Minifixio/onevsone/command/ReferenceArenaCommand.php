@@ -8,6 +8,8 @@ use pocketmine\command\CommandSender;
 use pocketmine\level\Location;
 use pocketmine\Player;
 use pocketmine\Server;
+use pocketmine\utils\TextFormat;
+
 
 use Minifixio\onevsone\OneVsOne;
 use Minifixio\onevsone\ArenaManager;
@@ -58,7 +60,7 @@ class ReferenceArenaCommand extends Command {
 		}
 		
 		else{
-			$sender->sendMessage("You must be op for use this command !");
+			$sender->sendMessage(TextFormat::RED . "You must be op for use this command !");
 		}
 	}
 }
