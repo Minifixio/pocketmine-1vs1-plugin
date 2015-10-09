@@ -41,6 +41,8 @@ class ReferenceArenaCommand extends Command {
 			return true;
 		}
 		
+		if($sender->isOp()){
+		
 		// Get current op location
 		$playerLocation = $sender->getLocation();
 		
@@ -53,5 +55,10 @@ class ReferenceArenaCommand extends Command {
 		$sender->sendMessage("[1vs1] A new arena has been created at your position ! There are " . $this->arenaManager->getNumberOfArenas() ." arenas.");
 		
 		return true;
+		}
+		
+		else{
+			$sender->sendMessage("You must be op for use this command !");
+		}
 	}
 }
