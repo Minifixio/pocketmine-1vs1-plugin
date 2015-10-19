@@ -5,5 +5,5 @@ api: [1.0.0, 1.1.0]
 description: 1vs1 Plugin
 
 permissions:
-  onevsone.refarena
+  onevsone.refarena:
     description: "Allows using /refarena"
