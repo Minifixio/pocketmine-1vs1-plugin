@@ -7,3 +7,4 @@ description: 1vs1 Plugin
 permissions:
   onevsone.refarena:
     description: "Allows using /refarena"
+    default: OP
