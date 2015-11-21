@@ -119,7 +119,7 @@ class Arena{
 	
 	private function giveKit(Player $player){
 		// Set his life to 20
-		$player->setHealth(20);
+		$player->setHealth(20);// Dont work now
 		$player->removeAllEffects();
 
    }
