@@ -13,4 +13,6 @@ signs:
   - 71
   - 130
   - world
+# command give to the winner
+reward-command: givemoney {PLAYER} 10
 ...
