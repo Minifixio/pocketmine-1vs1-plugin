@@ -28,8 +28,12 @@ Cool things:
 
 ### Commands:
 -> /match : join the 1vs1 queue
+
 -> /refarena : reference a new arena.
 
+### Permissions:
+
+onevsone.refarena : allows using /refarena, default: OP.
 
 ### Notes:
 -> Maybe you will find some mistakes in my plugin documentation, it’s just because i’m not english (french :c).
