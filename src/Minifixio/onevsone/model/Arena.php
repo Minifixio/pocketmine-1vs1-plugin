@@ -12,6 +12,8 @@ use pocketmine\item\Item;
 use pocketmine\utils\TextFormat;
 use pocketmine\entity\Effect;
 use pocketmine\entity\InstantEffect;
+use pocketmine\command\Command;
+use pocketmine\command\CommandSender;
 
 use \DateTime;
 use Minifixio\onevsone\ArenaManager;
@@ -149,6 +151,8 @@ class Arena{
    		// Set his life to 20
    		$winner->setHealth(20);
    		Server::getInstance()->broadcastMessage(TextFormat::GREEN . TextFormat::BOLD . "» " . TextFormat::GOLD . $winner->getName() . TextFormat::WHITE . OneVsOne::getMessage("duel_broadcast") . TextFormat::RED . $loser->getName() . TextFormat::WHITE . " !");
+		if($this->getConfig()->get("reward-command")){
+		   $player->getServer()->dispatchCommand(new ConsoleCommandSender(), str_ireplace("{PLAYER}", $winner->getName(), $this->getConfig()->get("reward-command")));
    		
    		// Reset arena
    		$this->reset();
@@ -198,6 +202,5 @@ class Arena{
 	 	return in_array($player, $this->players);
 	 }
 }
-
 
 
