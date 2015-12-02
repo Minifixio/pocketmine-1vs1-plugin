@@ -144,7 +144,7 @@ class Arena{
    		$winner->removeAllEffects();
    		
    		// Teleport the winner at spawn
-   		$winner->teleport($winner->getLevel()->getSafeSpawn());
+   		$winner->teleport($winner->getLevel()->getSpawn());
 
    		// Set his life to 20
    		$winner->setHealth(20);
