@@ -12,6 +12,8 @@ use pocketmine\item\Item;
 use pocketmine\utils\TextFormat;
 use pocketmine\entity\Effect;
 use pocketmine\entity\InstantEffect;
+use pocketmine\command\Command;
+use pocketmine\command\CommandSender;
 
 use \DateTime;
 use Minifixio\onevsone\ArenaManager;
@@ -118,23 +120,8 @@ class Arena{
 	}
 	
 	private function giveKit(Player $player){
-		// Clear inventory
-		$player->getInventory()->clearAll();
-		
-		// Give sword, food and armor
-		$player->getInventory()->addItem(Item::get(ITEM::IRON_SWORD));
-		$player->getInventory()->addItem(Item::get(ITEM::BREAD));
-		$player->getInventory()->setItemInHand(Item::get(ITEM::IRON_SWORD), $player);
-		
-		// Pur the armor on the player
-		$player->getInventory()->setHelmet(Item::get(302, 0, 1));
-		$player->getInventory()->setChestplate(Item::get(303, 0, 1));
-		$player->getInventory()->setLeggings(Item::get(304, 0, 1));
-		$player->getInventory()->setBoots(Item::get(305, 0, 1));
-		$player->getInventory()->sendArmorContents($player);
-		
 		// Set his life to 20
-		$player->setHealth(20);
+		$player->setHealth(20);// Dont work now
 		$player->removeAllEffects();
 
    }
@@ -159,11 +146,13 @@ class Arena{
    		$winner->removeAllEffects();
    		
    		// Teleport the winner at spawn
-   		$winner->teleport($winner->getSpawn());
+   		$winner->teleport($winner->getLevel()->getSpawn());
 
    		// Set his life to 20
    		$winner->setHealth(20);
    		Server::getInstance()->broadcastMessage(TextFormat::GREEN . TextFormat::BOLD . "» " . TextFormat::GOLD . $winner->getName() . TextFormat::WHITE . OneVsOne::getMessage("duel_broadcast") . TextFormat::RED . $loser->getName() . TextFormat::WHITE . " !");
+		if($this->getConfig()->get("reward-command")){
+		   $player->getServer()->dispatchCommand(new ConsoleCommandSender(), str_ireplace("{PLAYER}", $winner->getName(), $this->getConfig()->get("reward-command")));
    		
    		// Reset arena
    		$this->reset();
@@ -175,13 +164,6 @@ class Arena{
    private function reset(){
    		// Put active a rena after the duel
    		$this->active = FALSE;
-   		foreach ($this->players as $player){
-   			$player->getInventory()->setItemInHand(new Item(Item::AIR,0,0));
-   			$player->getInventory()->clearAll();
-   			$player->getInventory()->sendArmorContents($player);
-   			$player->getInventory()->sendContents($player);
-   			$player->getInventory()->sendHeldItem($player);
-   		}
    		$this->players = array();
    		$this->startTime = NULL;
    		if($this->taskHandler != NULL){
@@ -220,6 +202,5 @@ class Arena{
 	 	return in_array($player, $this->players);
 	 }
 }
-
 
 

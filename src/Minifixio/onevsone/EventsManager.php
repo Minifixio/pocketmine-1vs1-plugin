@@ -40,7 +40,7 @@ class EventsManager implements Listener{
 		$deadPlayer = $event->getEntity();
 		$arena = $this->arenaManager->getPlayerArena($deadPlayer);
 		$event->setDrops([]);
-		$event->setKeepInventory(false);
+		$event->setKeepInventory(true);
 		if($arena != NULL){
 			$arena->onPlayerDeath($deadPlayer);
 		}
