@@ -43,7 +43,7 @@ class ReferenceArenaCommand extends Command {
 			return true;
 		}
 		
-		if($sender->isOp()){
+		if($sender->hasPermission("onevsone.refarena")){
 		
 		// Get current op location
 		$playerLocation = $sender->getLocation();

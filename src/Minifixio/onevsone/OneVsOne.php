@@ -34,7 +34,7 @@ class OneVsOne extends PluginBase{
 	*/
     public function onEnable(){
     	self::$instance = $this;
-    	PluginUtils::logOnConsole(TextFormat::GREEN . "[1vs1] - Init OneVsOne plugin");
+    	PluginUtils::logOnConsole(TextFormat::GREEN . "Init" . TextFormat::RED ." 1vs1 " . TextFormat::GREEN. "plugin");
     	
     	// Get arena positions from arenas.yml
     	@mkdir($this->getDataFolder());

@@ -39,7 +39,7 @@ class ArenaManager{
 	 * Init the arenas
 	 */
 	public function init(Config $config){
-		PluginUtils::logOnConsole("- Init ArenaManager");
+		PluginUtils::logOnConsole(TextFormat::GREEN . "Init". TextFormat::RED . " ArenaManager");
 		$this->config = $config;
 		
 		if(!$this->config->arenas){
@@ -90,7 +90,7 @@ class ArenaManager{
 	 * Load signs
 	 */
 	public function parseSignPositions(array $signPositions) {
-		PluginUtils::logOnConsole("[1vs1] - Load signs... " . count($signPositions) . " signs");
+		PluginUtils::logOnConsole(TextFormat::GREEN . "Load signs... " . TextFormat::RED . count($signPositions) . " signs");
 		foreach ($signPositions as $n => $signPosition) {
 			Server::getInstance()->loadLevel($signPosition[3]);
 			if(($level = Server::getInstance()->getLevelByName($signPosition[3])) !== null){
@@ -108,7 +108,7 @@ class ArenaManager{
 				}
 			}
 			else{
-				PluginUtils::logOnConsole("[1vs1] - Level " . $signPosition[3] . " does not exists. Please check configuration." );
+				PluginUtils::logOnConsole(TextFormat::RED . "Level " . $signPosition[3] . " does not exists. Please check configuration." );
 			}
 		}
 	}	
@@ -179,7 +179,7 @@ class ArenaManager{
 	}
 	
 	/**
-	 * Allows to be notify when round ends
+	 * Allows to be notify when rounds ends
 	 * @param Arena $arena
 	 */
 	public function notifyEndOfRound(Arena $arena){
