@@ -124,7 +124,7 @@ class Arena{
 	
 	// Sets gamemode
 	private function setGamemode(Player $player){
-		$player->gamemode = (1) $newGamemode;
+		$player->gamemode = (0) $newGamemode;
 	}
 
 	private function giveKit(Player $player){
@@ -174,6 +174,7 @@ class Arena{
    		// Set his life to 20
    		$winner->setHealth(20);
    		Server::getInstance()->broadcastMessage(TextFormat::GREEN . TextFormat::BOLD . "» " . TextFormat::GOLD . $winner->getName() . TextFormat::WHITE . OneVsOne::getMessage("duel_broadcast") . TextFormat::RED . $loser->getName() . TextFormat::WHITE . " !");
+   		
    		
    		// Reset arena
    		$this->reset();
