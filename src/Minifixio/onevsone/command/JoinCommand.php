@@ -10,7 +10,6 @@ use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 
-
 use Minifixio\onevsone\OneVsOne;
 use Minifixio\onevsone\ArenaManager;
 
@@ -43,7 +42,7 @@ class JoinCommand extends Command implements PluginIdentifiableCommand{
 		}
 		
 		$this->arenaManager->addNewPlayerToQueue($sender);
-		
+	 	
 		return true;
 	}
 }

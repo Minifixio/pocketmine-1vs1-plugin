@@ -12,6 +12,10 @@ use pocketmine\item\Item;
 use pocketmine\utils\TextFormat;
 use pocketmine\entity\Effect;
 use pocketmine\entity\InstantEffect;
+use pocketmine\math\Vector3;
+use pocketmine\level\particle\SmokeParticle;
+use pocketmine\block\Block;
+use pocketmine\level\particle\DestroyBlockParticle;
 
 use \DateTime;
 use Minifixio\onevsone\ArenaManager;
@@ -89,6 +93,10 @@ class Arena{
 		$pos_player2->x += self::PLAYER_2_OFFSET_X;
 		$player1->teleport($pos_player1, 90, 0);
 		$player2->teleport($pos_player2, -90, 0);
+		$this->sparyParticle($player1);
+		$this->sparyParticle($player2);
+		$player1->setGamemode(0);
+		$player2->setGamemode(0);
 		
 		// Give kit
 		foreach ($this->players as $player){
@@ -219,6 +227,11 @@ class Arena{
 	 public function isPlayerInArena(Player $player){
 	 	return in_array($player, $this->players);
 	 }
+	 
+	 public function sparyParticle(Player $player){
+		$particle = new DestroyBlockParticle(new Vector3($player->getX(), $player->getY(), $player->getZ()), Block::get(8));
+	 	$player->getLevel()->addParticle($particle);
+    }
 }
 
 
