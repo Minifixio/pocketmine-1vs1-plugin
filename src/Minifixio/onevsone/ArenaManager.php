@@ -65,7 +65,7 @@ class ArenaManager{
 		// Launch sign refreshing task
 		$task = new SignRefreshTask(OneVsOne::getInstance());
 		$task->arenaManager = $this;
-		$this->signRefreshTaskHandler = Server::getInstance()->getScheduler()->scheduleRepeatingTask($task, self::SIGN_REFRESH_DELAY * 20);
+		$this->signRefreshTaskHandler = $this->getServer()->getScheduler()->scheduleRepeatingTask($task, self::SIGN_REFRESH_DELAY * 20); //Using a Static Function(Server::getInstance is bad practise! Fixed this.
 	}
 	
 	/**
@@ -74,14 +74,14 @@ class ArenaManager{
 	public function parseArenaPositions(array $arenaPositions) {
 		foreach ($arenaPositions as $n => $arenaPosition) {
 			Server::getInstance()->loadLevel($arenaPosition[3]);
-			if(($level = Server::getInstance()->getLevelByName($arenaPosition[3])) === null){
-				Server::getInstance()->getLogger()->error("[1vs1] - " . $arenaPosition[3] . " is not loaded. Arena " . $n . " is disabled.");
+			if(($level = $this->getServer()->getLevelByName($arenaPosition[3])) === null){ //Again, bad practise by using a static function(Server::getInstance), Fixed this.
+				$this->getServer()->getLogger()->error("[1vs1] - " . $arenaPosition[3] . " is not loaded. Arena " . $n . " is disabled."); //Again, bad practise by using a static function(Server::getInstance), Fixed this.
 			}
 			else{
 				$newArenaPosition = new Position($arenaPosition[0], $arenaPosition[1], $arenaPosition[2], $level);
 				$newArena = new Arena($newArenaPosition, $this);
 				array_push($this->arenas, $newArena);
-				Server::getInstance()->getLogger()->debug("[1vs1] - Arena " . $n . " loaded at position " . $newArenaPosition->__toString());
+				$this->getServer()->getLogger()->debug("[1vs1] - Arena " . $n . " loaded at position " . $newArenaPosition->__toString()); //Again, bad practise by using a static function(Server::getInstance), Fixed this.
 			}
 		}
 	}	
@@ -93,7 +93,7 @@ class ArenaManager{
 		PluginUtils::logOnConsole(TextFormat::GREEN . "Load signs... " . TextFormat::RED . count($signPositions) . " signs");
 		foreach ($signPositions as $n => $signPosition) {
 			Server::getInstance()->loadLevel($signPosition[3]);
-			if(($level = Server::getInstance()->getLevelByName($signPosition[3])) !== null){
+			if(($level = $this->getServer()->getLevelByName($signPosition[3])) !== null){ //Again, bad practise by using a static function(Server::getInstance), Fixed this.
 				$newSignPosition = new Position($signPosition[0], $signPosition[1], $signPosition[2], $level);
 				$tile = $level->getTile($newSignPosition);
 				if($tile != null){
@@ -151,12 +151,12 @@ class ArenaManager{
 		
 		// Check that there is at least 2 players in the queue
 		if(count($this->queue) < 2){
-			Server::getInstance()->getLogger()->debug("There is not enough players to start a duel : " . count($this->queue));
+			$this->getServer()->getLogger()->debug("There is not enough players to start a duel : " . count($this->queue)); //Again, bad practise by using a static function(Server::getInstance), Fixed this.
 			return;
 		}
 		
 		// Check if there is any arena free (not active)
-		Server::getInstance()->getLogger()->debug("Check ".  count($this->arenas) . " arenas");
+		$this->getServer()->getLogger()->debug("Check ".  count($this->arenas) . " arenas"); //Again, bad practise by using a static function(Server::getInstance), Fixed this.
 		
 		$freeArena = NULL;
 		foreach ($this->arenas as $arena){
@@ -167,14 +167,14 @@ class ArenaManager{
 		}
 		
 		if($freeArena == NULL){
-			Server::getInstance()->getLogger()->debug("[1vs1] - No free arena found");
+			$this->getServer()->getLogger()->debug("[1vs1] - No free arena found"); //Again, bad practise by using a static function(Server::getInstance), Fixed this.
 			return;
 		}
 		
 		// Send the players into the arena (and remove them from queues)
 		$roundPlayers = array();
 		array_push($roundPlayers, array_shift($this->queue), array_shift($this->queue));
-		Server::getInstance()->getLogger()->debug("[1vs1] - Starting duel : " . $roundPlayers[0]->getName() . " vs " . $roundPlayers[1]->getName());
+		$this->getServer(->getLogger()->debug("[1vs1] - Starting duel : " . $roundPlayers[0]->getName() . " vs " . $roundPlayers[1]->getName()); //Again, bad practise by using a static function(Server::getInstance), Fixed this.
 		$freeArena->startRound($roundPlayers);
 	}
 	
@@ -276,7 +276,6 @@ class ArenaManager{
 		}
 	}
 }
-
 
 
 
