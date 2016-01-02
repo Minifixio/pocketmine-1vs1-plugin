@@ -126,12 +126,19 @@ class Arena{
 	}
 	
 	private function giveKit(Player $player){
+		//Initialise Variables
+        $Bread = 0; 
+        
 		// Clear inventory
 		$player->getInventory()->clearAll();
 		
 		// Give sword, food and armor
 		$player->getInventory()->addItem(Item::get(ITEM::IRON_SWORD));
-		$player->getInventory()->addItem(Item::get(ITEM::BREAD));
+		while($Bread <= 16) 
+		{
+		    $player->getInventory()->addItem(Item::get(ITEM::BREAD));    		
+   		    $Bread++;
+	 	} 
 		$player->getInventory()->setItemInHand(Item::get(ITEM::IRON_SWORD), $player);
 		
 		// Pur the armor on the player
@@ -141,9 +148,10 @@ class Arena{
 		$player->getInventory()->setBoots(Item::get(305, 0, 1));
 		$player->getInventory()->sendArmorContents($player);
 		
-		// Set his life to 20
+		// SetHealth&removeAllEffects&SetFoodToFull
 		$player->setHealth(20);
 		$player->removeAllEffects();
+        	//$sender->setFood(20); //WILL CRASH IF ORIGINAL POCKETMINE USED! (ImagicalMine)
 
    }
    
