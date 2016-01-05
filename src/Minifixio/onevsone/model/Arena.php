@@ -127,7 +127,7 @@ class Arena{
 	
 	private function giveKit(Player $player){
 		//Initialise Variables
-        $Bread = 0; 
+                $Bread = 0; 
         
 		// Clear inventory
 		$player->getInventory()->clearAll();
@@ -241,6 +241,5 @@ class Arena{
 	 	$player->getLevel()->addParticle($particle);
     }
 }
-
 
 
