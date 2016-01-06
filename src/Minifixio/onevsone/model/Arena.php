@@ -205,7 +205,7 @@ class Arena{
    public function onPlayerQuit(Player $loser){
    		// Finish the duel when a player quit
    		// With onPlayerDeath() function
-   		$this->onPlayerDeath();
+   		$this->onPlayerDeath($loser);
    }
    
    /**
