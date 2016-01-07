@@ -134,7 +134,7 @@ class Arena{
 		
 		// Give sword, food and armor
 		$player->getInventory()->addItem(Item::get(ITEM::IRON_SWORD));
-		while($Bread <= 16) 
+		while($Bread <= 8) 
 		{
 		    $player->getInventory()->addItem(Item::get(ITEM::BREAD));    		
    		    $Bread++;
@@ -151,7 +151,7 @@ class Arena{
 		// SetHealth&removeAllEffects&SetFoodToFull
 		$player->setHealth(20);
 		$player->removeAllEffects();
-        	//$player->setFood(20); //WILL CRASH IF ORIGINAL POCKETMINE USED! (ImagicalMine must be used!)
+        	$player->setFood(20); //WILL CRASH IF ORIGINAL POCKETMINE USED! (ImagicalMine must be used!)
 
    }
    
