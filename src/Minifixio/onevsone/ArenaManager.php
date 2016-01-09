@@ -174,7 +174,7 @@ class ArenaManager{
 		// Send the players into the arena (and remove them from queues)
 		$roundPlayers = array();
 		array_push($roundPlayers, array_shift($this->queue), array_shift($this->queue));
-		$this->getServer(->getLogger()->debug("[1vs1] - Starting duel : " . $roundPlayers[0]->getName() . " vs " . $roundPlayers[1]->getName()); //Again, bad practise by using a static function(Server::getInstance), Fixed this.
+		$this->getServer->getLogger()->debug("[1vs1] - Starting duel : " . $roundPlayers[0]->getName() . " vs " . $roundPlayers[1]->getName()); //Again, bad practise by using a static function(Server::getInstance), Fixed this.
 		$freeArena->startRound($roundPlayers);
 	}
 	
