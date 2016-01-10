@@ -126,19 +126,12 @@ class Arena{
 	}
 	
 	private function giveKit(Player $player){
-		//Initialise Variables
-                $Bread = 0; 
-        
 		// Clear inventory
 		$player->getInventory()->clearAll();
 		
 		// Give sword, food and armor
 		$player->getInventory()->addItem(Item::get(ITEM::IRON_SWORD));
-		while($Bread <= 8) 
-		{
-		    $player->getInventory()->addItem(Item::get(ITEM::BREAD));    		
-   		    $Bread++;
-	 	} 
+		$player->getInventory()->addItem(Item::get(Item::BREAD, 0, 8));
 		$player->getInventory()->setItemInHand(Item::get(ITEM::IRON_SWORD), $player);
 		
 		// Pur the armor on the player
@@ -241,5 +234,4 @@ class Arena{
 	 	$player->getLevel()->addParticle($particle);
     }
 }
-
 
