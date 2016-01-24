@@ -111,6 +111,9 @@ class Arena{
 		
 		$player2->sendTip(OneVsOne::getMessage("duel_tip"));
 		$player2->sendMessage(OneVsOne::getMessage("duel_start"));
+
+                $task = new GameTime(OneVsOne::getInstance(), $this);
+		$this->countdownTaskHandler = Server::getInstance()->getScheduler()->scheduleDelayedRepeatingTask($task, 20, 20);			
 		
 		// Launch the end round task
 		$task = new RoundCheckTask(OneVsOne::getInstance());
@@ -233,6 +236,5 @@ class Arena{
 	 	$player->getLevel()->addParticle($particle);
     }
 }
-
 
 
