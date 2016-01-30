@@ -65,7 +65,7 @@ class ArenaManager{
 		// Launch sign refreshing task
 		$task = new SignRefreshTask(OneVsOne::getInstance());
 		$task->arenaManager = $this;
-		$this->signRefreshTaskHandler = $this->getOwner()->getServer()->getScheduler()->scheduleRepeatingTask($task, self::SIGN_REFRESH_DELAY * 20); //Using a Static Function(Server::getInstance is bad practise! Fixed this.
+		$this->signRefreshTaskHandler = $this->main->getOwner()->getServer()->getScheduler()->scheduleRepeatingTask($task, self::SIGN_REFRESH_DELAY * 20); //Using a Static Function(Server::getInstance is bad practise! Fixed this.
 	}
 	
 	/**
