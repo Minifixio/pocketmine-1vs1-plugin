@@ -106,10 +106,10 @@ class Arena{
 		// Fix start time
 		$this->startTime = new DateTime('now');
 		
-		$player1->sendTip(OneVsOne::getMessage("duel_tip"));
+		$player1->sendPopup(OneVsOne::getMessage("duel_tip"));
 		$player1->sendMessage(OneVsOne::getMessage("duel_start"));
 		
-		$player2->sendTip(OneVsOne::getMessage("duel_tip"));
+		$player2->sendPopup(OneVsOne::getMessage("duel_tip"));
 		$player2->sendMessage(OneVsOne::getMessage("duel_start"));
 		
 		// Launch the end round task

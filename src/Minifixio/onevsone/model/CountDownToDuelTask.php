@@ -32,8 +32,8 @@ class CountDownToDuelTask extends PluginTask{
 				$this->arena->abortDuel();
 			}
 			else{
-				$player1->sendTip(TextFormat::GOLD . TextFormat::BOLD . $this->countdownValue . TextFormat::RESET . " sec...");
-				$player2->sendTip(TextFormat::GOLD . TextFormat::BOLD . $this->countdownValue . TextFormat::RESET . " sec...");
+				$player1->sendPopup(TextFormat::GOLD . TextFormat::BOLD . $this->countdownValue . TextFormat::RESET . " sec...");
+				$player2->sendPopup(TextFormat::GOLD . TextFormat::BOLD . $this->countdownValue . TextFormat::RESET . " sec...");
 				$this->countdownValue--;
 				
 				// If countdown is finished, start the duel and stop the task
