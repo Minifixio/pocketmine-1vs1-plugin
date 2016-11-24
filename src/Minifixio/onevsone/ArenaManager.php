@@ -138,7 +138,7 @@ class ArenaManager{
 		PluginUtils::logOnConsole("[1vs1] - There is actually " . count($this->queue) . " players in the queue");
 		PluginUtils::sendDefaultMessage($newPlayer, OneVsOne::getMessage("queue_join"));
 		PluginUtils::sendDefaultMessage($newPlayer, OneVsOne::getMessage("queue_playersinqueue"). count($this->queue));
-		$newPlayer->sendTip(OneVsOne::getMessage("queue_popup"));
+		$newPlayer->sendPopup(OneVsOne::getMessage("queue_popup"));
 		
 		$this->launchNewRounds();
 		$this->refreshSigns();
