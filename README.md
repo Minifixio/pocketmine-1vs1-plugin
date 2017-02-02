@@ -28,7 +28,8 @@ Cool things:
 
 ### Commands:
 -> /match : join the 1vs1 queue
--> /refarena : reference a new arena.
+
+-> /refarena : reference a new arena. Permission - onevsone.refarena
 
 
 ### Notes:

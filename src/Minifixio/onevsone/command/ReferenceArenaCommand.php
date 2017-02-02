@@ -60,7 +60,7 @@ class ReferenceArenaCommand extends Command {
 		}
 		
 		else{
-			$sender->sendMessage(TextFormat::RED . "You must be op for use this command !");
+			$sender->sendMessage(TextFormat::RED . "You don't have permission to use this command !");
 		}
 	}
 }

@@ -98,6 +98,11 @@ class Arena{
 		$player1->setGamemode(0);
 		$player2->setGamemode(0);
 		
+		// Set Gamemode
+		foreach ($this->players as $player){
+			$this->setGamemode
+		}
+
 		// Give kit
 		foreach ($this->players as $player){
 			$this->giveKit($player);
@@ -125,6 +130,11 @@ class Arena{
 		Server::getInstance()->getScheduler()->cancelTask($this->countdownTaskHandler->getTaskId());
 	}
 	
+	// Sets gamemode
+	private function setGamemode(Player $player){
+		$player->gamemode = (1) $newGamemode;
+	}
+
 	private function giveKit(Player $player){
 		// Clear inventory
 		$player->getInventory()->clearAll();
