@@ -25,12 +25,15 @@ class OneVsOne extends PluginBase{
 	/** @var Config */
 	public $arenaConfig;
 	
+	/** @var array */
 	public $messages;
 	
 	CONST SIGN_TITLE = '[1vs1]';
 	
 	/**
 	* Plugin is enabled by PocketMine server
+	*
+	* @return void
 	*/
     public function onEnable(){
     	self::$instance = $this;
@@ -61,14 +64,25 @@ class OneVsOne extends PluginBase{
     	$this->getServer()->getCommandMap()->register($referenceArenaCommand->commandName, $referenceArenaCommand);    	
     }
     
+	/**
+	 * @return OneVsOne
+	 */
     public static function getInstance(){
     	return self::$instance;
     }
     
+	/**
+	 * @param string $key
+	 *
+	 * @return string
+	 */
     public static function getMessage($key){
     	return str_replace("&", "§", self::$instance->messages->get($key));
     }
     
+	/**
+	 * @return void
+	 */
     public function onDisable() {
  
     }
