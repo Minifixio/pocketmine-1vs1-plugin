@@ -1,41 +1,43 @@
-# 1vs1 plugin by Minifixio
+# 1vs1 Plugin for PocketMine
 
 ## Description:
-You want to make 1vs1s on your MCPE server ? This plugin is for you !
+The 1vs1 plugin is designed for Minecraft PE (MCPE) server owners who want to facilitate 1vs1 matches on their servers. Packed with features like a multi-arena system, automatic queue management, and statistics signs, this plugin enhances the 1vs1 experience for both players and server administrators.
 
-Cool things:
--> Multi arenas system
--> Auto queue management
--> Statistics signs
+## Features:
+- **Multi Arenas System:** Set up multiple arenas on your server, allowing concurrent 1vs1 matches.
+- **Auto Queue Management:** Automatically manage player queues, ensuring a seamless experience for participants.
+- **Statistics Signs:** Place signs with "[1vs1]" on the first line to display 1vs1 statistics, including the number of active arenas and players in the queue. The signs refresh every 5 seconds.
 
+## How to Use:
+1. **Reference Arenas:**
+   - Use the command `/refarena` at the center of your arena to reference it.
+   - Players will spawn 5 blocks from the middle of the arena.
+   - You can create an unlimited number of arenas, and their positions are saved in the `config.yml` file.
 
-## How to use:
--> First, you'll need to reference your(s) arena(s) doing /refarena on the middle of your arena. The players will spawn 5 blocks from the middle of the arena (see example below). You can make an unlimited numbers of arenas. All the arenas’s positions are saved in the config.yml file.
+2. **Start a Duel:**
+   - Players can initiate a duel with `/match`.
+   - A countdown will commence, and once complete, the fight begins (limited to 2 players per arena).
+   - Players are teleported to the arena, equipped with a sword, armor, and food, with all effects removed for a fair fight.
+   - The duel lasts 3 minutes, and if there is no winner, players are teleported back to the spawn.
 
--> Then, the players can start a duel doing /match, a countdown before the fight will start (only 2 players per arena) and they will be teleported in an arena and they will get a sword, armor and food and all their effects will be removed for fight. The fight last 3 minutes and at the end of the timer if there is no winners, the duel ends and the players are teleported back to the spawn.
+3. **Statistics Signs:**
+   - Place a sign with "[1vs1]" on the first line to create a 1vs1 stats sign.
+   - The sign displays the number of active arenas and players in the queue.
+   - Signs refresh every 5 seconds.
 
--> You can place a sign and write on the 1st line : « [1vs1] » to have a 1vs1 stats sign with the numbers of active arenas and the number of the players in the queue. The signs refreshes every 5 seconds.
-
-## Technical:
--> After a fight, the players are teleported back to the spawn of the default level server.
-
--> When a player quit in a fight, his opponent win.
-
--> The arenas and the 1vs1’s signs positions are stored in the config.yml file.
-
--> When a player quit during the start match countdown, the match stops.
-
+## Technical Details:
+- After a fight, players are teleported back to the spawn of the default server level.
+- If a player quits during a fight, their opponent is declared the winner.
+- Arena and 1vs1 sign positions are stored in the `config.yml` file.
+- If a player quits during the match countdown, the match stops.
 
 ## Commands:
--> /match : join the 1vs1 queue
--> /refarena : reference a new arena.
-
+- `/match`: Join the 1vs1 queue.
+- `/refarena`: Reference a new arena.
 
 ## Notes:
--> Maybe you will find some mistakes in my plugin documentation, it’s just because i’m not english (french :c).
+- You can modify messages in the plugin source; future updates will allow customization via a message config file.
+- Spawn distance in an arena and match timers will be customizable in a future update.
+- Any feedback or remarks are welcome for continuous improvement!
 
--> You can only change the messages in the plugin source but soon you will can change it in a message config file.
-
--> You will able to change the spawn distance in a arena and the timers for the matches in an update soon.
-
--> Any remarks ? Tell me it for a better world x) !
+*Enjoy your 1vs1 matches on your MCPE server!*
